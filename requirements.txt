@@ -1,0 +1,32 @@
+# LLM provider SDKs
+openai>=1.50,<2.0
+anthropic>=0.39,<1.0
+google-generativeai>=0.8,<1.0
+
+# Data validation and settings
+pydantic>=2.9,<3.0
+pydantic-settings>=2.5,<3.0
+
+# HTTP and async
+aiohttp>=3.10,<4.0
+
+# Templating
+jinja2>=3.1,<4.0
+
+# Embedding scorer
+sentence-transformers>=3.1,<4.0
+
+# Statistical tests
+scipy>=1.13,<2.0
+
+# Dashboard
+streamlit>=1.38,<2.0
+
+# Testing
+pytest>=8.3,<9.0
+pytest-asyncio>=0.24,<1.0
+
+# Environment and utilities
+python-dotenv>=1.0,<2.0
+rich>=13.8,<14.0
+pyyaml>=6.0,<7.0
