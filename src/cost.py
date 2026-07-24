@@ -1,6 +1,12 @@
 """Per-provider pricing constants and cost calculation for LLM-CI."""
 
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.models import CaseResult
 
 logger = logging.getLogger(__name__)
 
@@ -35,3 +41,8 @@ def calculate_cost_aud(
     input_cost = (input_tokens / 1000) * model_pricing["input_per_1k"]
     output_cost = (output_tokens / 1000) * model_pricing["output_per_1k"]
     return round(input_cost + output_cost, 6)
+
+
+def summarise_run_cost(case_results: list[CaseResult]) -> float:
+    """Sum all estimated_cost_aud values across case results."""
+    return round(sum(cr.estimated_cost_aud for cr in case_results), 6)
