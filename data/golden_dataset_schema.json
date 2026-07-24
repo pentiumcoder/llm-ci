@@ -1,1 +1,75 @@
-// Sprint 4
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GoldenDataset",
+  "description": "The complete golden evaluation dataset for LLM-CI.",
+  "type": "object",
+  "required": ["version", "created_at", "cases"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Dataset version"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 creation timestamp"
+    },
+    "cases": {
+      "type": "array",
+      "description": "Array of evaluation cases",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "input",
+          "expected_category",
+          "expected_summary_keywords",
+          "difficulty",
+          "tags",
+          "notes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique case identifier, e.g. case_001"
+          },
+          "input": {
+            "type": "string",
+            "description": "Raw email text"
+          },
+          "expected_category": {
+            "type": "string",
+            "enum": ["billing", "technical", "account", "general"],
+            "description": "Ground truth category"
+          },
+          "expected_summary_keywords": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1,
+            "description": "Keywords a good summary should contain"
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": ["easy", "medium", "hard", "edge"],
+            "description": "Case difficulty level"
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Relevant tags for this case"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Why this case exists and what it tests"
+          },
+          "adversarial_target": {
+            "type": ["string", "null"],
+            "description": "The category adversarial cases are designed to trigger (null for non-adversarial)"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
