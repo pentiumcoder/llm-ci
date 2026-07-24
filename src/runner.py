@@ -14,12 +14,15 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
+from src.comparator import compute_diff
 from src.config import Settings
 from src.cost import calculate_cost_aud, summarise_run_cost
 from src.dataset import load_dataset
+from src.difficulty import compute_difficulty_breakdown
 from src.feature import classify_email, load_prompt
 from src.models import CaseResult, EvalRun
 from src.providers.factory import get_provider
+from src.scorer import compute_composite, compute_p95_latency, score_embedding, score_judge, score_keywords
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +36,7 @@ async def _run_one_case(
     settings,
     semaphore: asyncio.Semaphore,
 ) -> CaseResult:
-    """Run classify_email for a single case, wrapped in a semaphore."""
+    """Run classify_email for a single case, then score the summary."""
     async with semaphore:
         result = await classify_email(
             email_text=case.input,
@@ -49,6 +52,20 @@ async def _run_one_case(
             output_tokens=result.output_tokens,
         )
 
+        expected_summary = " ".join(case.expected_summary_keywords)
+
+        judge_score, judge_reason = await score_judge(
+            email_text=case.input,
+            predicted_summary=result.summary,
+            expected_summary=expected_summary,
+            provider=provider,
+            settings=settings,
+        )
+
+        embedding_score = score_embedding(result.summary, case.expected_summary_keywords)
+        keyword_score = score_keywords(result.summary, case.expected_summary_keywords)
+        composite = compute_composite(judge_score, embedding_score, keyword_score)
+
         return CaseResult(
             case_id=case.id,
             prompt_version=prompt_config.version,
@@ -57,11 +74,11 @@ async def _run_one_case(
             predicted_category=result.category,
             expected_category=case.expected_category,
             category_match=(result.category == case.expected_category),
-            summary_score_judge=0.0,
-            summary_score_embedding=0.0,
-            summary_score_keyword=0.0,
-            composite_summary_score=0.0,
-            judge_reason="",
+            summary_score_judge=judge_score,
+            summary_score_embedding=embedding_score,
+            summary_score_keyword=keyword_score,
+            composite_summary_score=composite,
+            judge_reason=judge_reason,
             latency_ms=result.latency_ms,
             input_tokens=result.input_tokens,
             output_tokens=result.output_tokens,
@@ -99,9 +116,8 @@ async def run_eval(prompt_path: str, settings: Settings) -> EvalRun:
     composite_scores = [cr.composite_summary_score for cr in case_results]
     avg_composite = statistics.mean(composite_scores) if composite_scores else 0.0
 
-    latencies = sorted([cr.latency_ms for cr in case_results]) if case_results else [0]
-    p95_idx = max(0, int(len(latencies) * 0.95) - 1)
-    p95_latency = latencies[p95_idx]
+    latencies = [cr.latency_ms for cr in case_results] if case_results else []
+    p95_latency = compute_p95_latency(latencies)
 
     total_input = sum(cr.input_tokens for cr in case_results)
     total_output = sum(cr.output_tokens for cr in case_results)
@@ -125,12 +141,19 @@ async def run_eval(prompt_path: str, settings: Settings) -> EvalRun:
         case_results=list(case_results),
     )
 
-    from src.storage import init_db, save_run
+    run.difficulty_breakdown = compute_difficulty_breakdown(case_results, dataset)
+
+    from src.storage import get_latest_runs, init_db, save_run
 
     init_db(settings.db_path)
+    previous_runs = get_latest_runs(1, settings.db_path)
+    previous_run = previous_runs[0] if previous_runs else None
+    diff = compute_diff(run, previous_run, settings, dataset)
+    run.status = diff.status
+
     save_run(run, settings.db_path)
-    logger.info("Run %s saved to %s (%d cases, %.2f%% accuracy, AUD $%.4f)",
-                run_id, settings.db_path, total_cases, accuracy * 100, total_cost)
+    logger.info("Run %s saved to %s (%d cases, %.2f%% accuracy, AUD $%.4f, status=%s)",
+                run_id, settings.db_path, total_cases, accuracy * 100, total_cost, run.status)
 
     return run
 
