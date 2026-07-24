@@ -42,12 +42,27 @@ class GoldenCase(BaseModel):
     adversarial_target: str | None = None
 
 
+class GenerationMetadata(BaseModel):
+    """Metadata documenting how the golden dataset was generated."""
+
+    generator_model: str
+    prompt_version: str
+    temperature: float
+    generation_timestamp: datetime
+    total_api_calls: int
+    total_input_tokens: int
+    total_output_tokens: int
+    estimated_cost_aud: float
+    generation_mode_counts: dict[str, int]
+
+
 class GoldenDataset(BaseModel):
     """The complete golden evaluation dataset."""
 
     version: str
     created_at: datetime
     cases: list[GoldenCase]
+    metadata: GenerationMetadata | None = None
 
 
 class CaseResult(BaseModel):

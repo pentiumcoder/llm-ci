@@ -17,6 +17,8 @@
     "cases": {
       "type": "array",
       "description": "Array of evaluation cases",
+      "minItems": 100,
+      "maxItems": 100,
       "items": {
         "type": "object",
         "required": [
@@ -31,10 +33,12 @@
         "properties": {
           "id": {
             "type": "string",
+            "pattern": "^case_\\d{3}$",
             "description": "Unique case identifier, e.g. case_001"
           },
           "input": {
             "type": "string",
+            "minLength": 1,
             "description": "Raw email text"
           },
           "expected_category": {
@@ -69,6 +73,67 @@
         },
         "additionalProperties": false
       }
+    },
+    "metadata": {
+      "type": ["object", "null"],
+      "description": "Generation metadata for reproducibility",
+      "properties": {
+        "generator_model": {
+          "type": "string",
+          "description": "Model used to generate the dataset"
+        },
+        "prompt_version": {
+          "type": "string",
+          "description": "Version of the prompt used"
+        },
+        "temperature": {
+          "type": "number",
+          "description": "Sampling temperature"
+        },
+        "generation_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO8601 timestamp of generation"
+        },
+        "total_api_calls": {
+          "type": "integer",
+          "description": "Number of API calls made"
+        },
+        "total_input_tokens": {
+          "type": "integer",
+          "description": "Total input tokens consumed"
+        },
+        "total_output_tokens": {
+          "type": "integer",
+          "description": "Total output tokens generated"
+        },
+        "estimated_cost_aud": {
+          "type": "number",
+          "description": "Estimated total cost in AUD"
+        },
+        "generation_mode_counts": {
+          "type": "object",
+          "description": "Number of cases per generation mode",
+          "properties": {
+            "standard": { "type": "integer" },
+            "adversarial": { "type": "integer" },
+            "multilingual": { "type": "integer" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "generator_model",
+        "prompt_version",
+        "temperature",
+        "generation_timestamp",
+        "total_api_calls",
+        "total_input_tokens",
+        "total_output_tokens",
+        "estimated_cost_aud",
+        "generation_mode_counts"
+      ],
+      "additionalProperties": false
     }
   },
   "additionalProperties": false
