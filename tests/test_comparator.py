@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
 from src.comparator import compute_diff, determine_status
 from src.config import Settings
+from src.drift import check_slow_drift, get_drift_summary
 from src.models import CaseResult, EvalRun, GoldenCase, GoldenDataset, RunDiff
 
 
@@ -281,3 +282,77 @@ class TestDetermineStatus:
             status="PASS",
         )
         assert determine_status(diff, self._settings()) == "WARN"
+
+
+def _make_drift_run(accuracy: float, hours_ago: int) -> EvalRun:
+    """Create a minimal EvalRun for drift testing with a specific timestamp."""
+    return EvalRun(
+        run_id=f"run_{hours_ago:03d}",
+        prompt_version="1.0.0",
+        model="gpt-4o-mini",
+        provider="openai",
+        timestamp=datetime.now(timezone.utc) - timedelta(hours=hours_ago),
+        total_cases=100,
+        accuracy=accuracy,
+        avg_composite_summary_score=0.78,
+        p95_latency_ms=150,
+        total_input_tokens=10000,
+        total_output_tokens=5000,
+        total_cost_aud=0.1,
+        status="PASS",
+        difficulty_breakdown={},
+        case_results=[],
+    )
+
+
+class TestCheckSlowDrift:
+    """Tests for check_slow_drift."""
+
+    def test_declining_runs_detected(self) -> None:
+        """Verify drift detected when 7 runs decline from 95% to 83%."""
+        settings = Settings()
+        settings.slow_drift_window = 7
+        settings.slow_drift_threshold = -0.05
+        # Newest first: 83%, 85%, 87%, 89%, 91%, 93%, 95%
+        runs = [_make_drift_run(acc, i) for i, acc in enumerate([0.83, 0.85, 0.87, 0.89, 0.91, 0.93, 0.95])]
+        assert check_slow_drift(runs, settings) is True
+
+    def test_stable_runs_no_drift(self) -> None:
+        """Verify no drift when 7 runs are stable at 90%."""
+        settings = Settings()
+        settings.slow_drift_window = 7
+        settings.slow_drift_threshold = -0.05
+        runs = [_make_drift_run(0.90, i) for i in range(7)]
+        assert check_slow_drift(runs, settings) is False
+
+    def test_fewer_than_window_returns_false(self) -> None:
+        """Verify False when fewer runs than window size."""
+        settings = Settings()
+        settings.slow_drift_window = 7
+        runs = [_make_drift_run(0.83, i) for i in range(5)]
+        assert check_slow_drift(runs, settings) is False
+
+
+class TestGetDriftSummary:
+    """Tests for get_drift_summary."""
+
+    def test_drift_detected_message(self) -> None:
+        """Verify human-readable message when drift is detected."""
+        settings = Settings()
+        settings.slow_drift_window = 7
+        settings.slow_drift_threshold = -0.05
+        runs = [_make_drift_run(acc, i) for i, acc in enumerate([0.83, 0.85, 0.87, 0.89, 0.91, 0.93, 0.95])]
+        summary = get_drift_summary(runs, settings)
+        assert "Slow drift detected" in summary
+        assert "95.0%" in summary
+        assert "89.0%" in summary
+        assert "7 runs" in summary
+
+    def test_no_drift_message(self) -> None:
+        """Verify 'No slow drift detected' when no drift."""
+        settings = Settings()
+        settings.slow_drift_window = 7
+        settings.slow_drift_threshold = -0.05
+        runs = [_make_drift_run(0.90, i) for i in range(7)]
+        summary = get_drift_summary(runs, settings)
+        assert summary == "No slow drift detected"

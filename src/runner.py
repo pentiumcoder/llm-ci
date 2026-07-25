@@ -19,6 +19,7 @@ from src.config import Settings
 from src.cost import calculate_cost_aud, summarise_run_cost
 from src.dataset import load_dataset
 from src.difficulty import compute_difficulty_breakdown
+from src.drift import check_slow_drift, get_drift_summary
 from src.feature import classify_email, load_prompt
 from src.models import CaseResult, EvalRun
 from src.providers.factory import get_provider
@@ -150,6 +151,15 @@ async def run_eval(prompt_path: str, settings: Settings) -> EvalRun:
     previous_run = previous_runs[0] if previous_runs else None
     diff = compute_diff(run, previous_run, settings, dataset)
     run.status = diff.status
+
+    drift_runs = get_latest_runs(settings.slow_drift_window, settings.db_path)
+    drift_warning = check_slow_drift(drift_runs, settings)
+    if drift_warning:
+        logger.warning("Slow drift detected for run %s", run_id)
+        drift_msg = get_drift_summary(drift_runs, settings)
+        logger.warning(drift_msg)
+    else:
+        logger.info("No slow drift detected for run %s", run_id)
 
     save_run(run, settings.db_path)
     logger.info("Run %s saved to %s (%d cases, %.2f%% accuracy, AUD $%.4f, status=%s)",
