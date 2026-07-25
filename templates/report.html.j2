@@ -1,1 +1,220 @@
-<!-- Sprint 9 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM-CI Eval Report — {{ run.run_id[:8] }}</title>
+<style>
+  :root {
+    --pass: #22c55e; --warn: #f59e0b; --fail: #ef4444;
+    --bg: #0f172a; --card: #1e293b; --border: #334155;
+    --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 2rem; line-height: 1.6; }
+  .container { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+  .badge { display: inline-block; padding: 0.2rem 0.75rem; border-radius: 4px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
+  .badge-PASS { background: var(--pass); color: #000; }
+  .badge-WARN { background: var(--warn); color: #000; }
+  .badge-FAIL { background: var(--fail); color: #fff; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem; }
+  .card h2 { font-size: 1rem; margin-bottom: 0.75rem; color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .delta-pos { color: var(--pass); }
+  .delta-neg { color: var(--fail); }
+  .delta-zero { color: var(--muted); }
+  .diff-cell { background: rgba(239,68,68,0.15); }
+  .diff-cell-amber { background: rgba(245,158,11,0.15); }
+  .diff-cell-green { background: rgba(34,197,94,0.15); }
+  .sig-yes { color: var(--warn); font-weight: 600; }
+  .sig-no { color: var(--muted); }
+  .drift-warn { background: rgba(245,158,11,0.1); border-left: 4px solid var(--warn); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1.25rem; font-size: 0.9rem; }
+  .diff-warn { background: rgba(239,68,68,0.1); border-left: 4px solid var(--fail); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1.25rem; font-size: 0.9rem; }
+  .sparkline { display: block; margin: 0.5rem auto 0; }
+  .truncate { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.25rem;">
+    <h1>LLM-CI Eval Report</h1>
+    <span class="badge badge-{{ run.status }}">{{ run.status }}</span>
+  </div>
+  <div class="meta">
+    Run <code>{{ run.run_id[:8] }}</code> &middot;
+    {{ run.provider }} / {{ run.model }} &middot;
+    Prompt v{{ run.prompt_version }} &middot;
+    {{ run.timestamp.strftime('%Y-%m-%d %H:%M UTC') }}
+  </div>
+
+  <div class="card">
+    <h2>Scorecard</h2>
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>Current</th><th>Previous</th><th>Delta</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Accuracy</td>
+          <td class="num">{{ "%.1f"|format(run.accuracy * 100) }}%</td>
+          <td class="num">{{ "%.1f"|format((prev_run.accuracy * 100) if prev_run else 0) }}%</td>
+          <td class="num {{ 'delta-pos' if (diff.accuracy_delta or 0) > 0 else ('delta-neg' if (diff.accuracy_delta or 0) < 0 else 'delta-zero') }}">{{ "%+.1f"|format((diff.accuracy_delta or 0) * 100) }}%</td>
+        </tr>
+        <tr>
+          <td>Composite Summary Score</td>
+          <td class="num">{{ "%.3f"|format(run.avg_composite_summary_score) }}</td>
+          <td class="num">{{ "%.3f"|format(prev_run.avg_composite_summary_score if prev_run else 0) }}</td>
+          <td class="num {{ 'delta-pos' if (diff.summary_score_delta or 0) > 0 else ('delta-neg' if (diff.summary_score_delta or 0) < 0 else 'delta-zero') }}">{{ "%+.3f"|format(diff.summary_score_delta or 0) }}</td>
+        </tr>
+        <tr>
+          <td>P95 Latency</td>
+          <td class="num">{{ run.p95_latency_ms }}ms</td>
+          <td class="num">{{ prev_run.p95_latency_ms if prev_run else '—' }}ms</td>
+          <td class="num delta-zero">—</td>
+        </tr>
+        <tr>
+          <td>Total Cost (AUD)</td>
+          <td class="num">${{ "%.4f"|format(run.total_cost_aud) }}</td>
+          <td class="num">${{ "%.4f"|format(prev_run.total_cost_aud if prev_run else 0) }}</td>
+          <td class="num {{ 'delta-pos' if (diff.cost_delta_aud or 0) > 0 else ('delta-neg' if (diff.cost_delta_aud or 0) < 0 else 'delta-zero') }}">{{ "%+.4f"|format(diff.cost_delta_aud or 0) }}</td>
+        </tr>
+        <tr>
+          <td>Cases</td>
+          <td class="num">{{ run.total_cases }}</td>
+          <td class="num">{{ prev_run.total_cases if prev_run else '—' }}</td>
+          <td class="num delta-zero">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Statistical Significance</h2>
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Z-statistic</td>
+          <td class="num">{{ "%.3f"|format(diff.z_statistic) if diff.z_statistic is not none else '—' }}</td>
+        </tr>
+        <tr>
+          <td>P-value</td>
+          <td class="num">{{ "%.3f"|format(diff.p_value) if diff.p_value is not none else '—' }}</td>
+        </tr>
+        <tr>
+          <td>Significant</td>
+          <td class="{{ 'sig-yes' if diff.is_significant else 'sig-no' }}">{{ 'Yes ⚠' if diff.is_significant else 'No' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Difficulty Breakdown</h2>
+    {% if run.difficulty_breakdown %}
+    <table>
+      <thead>
+        <tr><th>Difficulty</th>{% for cat in categories %}<th>{{ cat }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for diff_level in difficulty_order %}
+        <tr>
+          <td>{{ diff_level }}</td>
+          {% for cat in categories %}
+          {% set val = run.difficulty_breakdown.get(diff_level, {}).get(cat, None) %}
+          <td class="num {% if val is not none %}{% if val < 0.70 %}diff-cell{% elif val < 0.85 %}diff-cell-amber{% else %}diff-cell-green{% endif %}{% endif %}">
+            {{ "%.0f"|format(val * 100) + '%' if val is not none else '—' }}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="color:var(--muted);">No difficulty data available.</p>
+    {% endif %}
+  </div>
+
+  {% if regression_table %}
+  <div class="card">
+    <h2>Regression Cases ({{ regression_table|length }})</h2>
+    <table>
+      <thead>
+        <tr><th>Case ID</th><th>Email</th><th>Expected</th><th>Predicted</th><th>Score</th><th>Judge Reason</th><th>Adversarial</th></tr>
+      </thead>
+      <tbody>
+        {% for row in regression_table %}
+        <tr>
+          <td>{{ row.case_id }}</td>
+          <td><span class="truncate" title="{{ row.email }}">{{ row.email }}</span></td>
+          <td>{{ row.expected }}</td>
+          <td>{{ row.predicted }}</td>
+          <td class="num">{{ "%.3f"|format(row.score) }}</td>
+          <td>{{ row.reason }}</td>
+          <td>{{ row.adversarial_target or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if improvement_table %}
+  <div class="card">
+    <h2>Improvement Cases ({{ improvement_table|length }})</h2>
+    <table>
+      <thead>
+        <tr><th>Case ID</th><th>Email</th><th>Expected</th><th>Predicted</th><th>Score</th><th>Judge Reason</th><th>Adversarial</th></tr>
+      </thead>
+      <tbody>
+        {% for row in improvement_table %}
+        <tr>
+          <td>{{ row.case_id }}</td>
+          <td><span class="truncate" title="{{ row.email }}">{{ row.email }}</span></td>
+          <td>{{ row.expected }}</td>
+          <td>{{ row.predicted }}</td>
+          <td class="num">{{ "%.3f"|format(row.score) }}</td>
+          <td>{{ row.reason }}</td>
+          <td>{{ row.adversarial_target or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <h2>Accuracy Trend</h2>
+    {{ accuracy_trend_svg|safe }}
+  </div>
+
+  <div class="card">
+    <h2>Cost Trend (AUD)</h2>
+    {{ cost_trend_svg|safe }}
+  </div>
+
+  {% if drift_warning %}
+  <div class="drift-warn">
+    ⚠ Slow drift detected: {{ drift_summary }}
+  </div>
+  {% endif %}
+
+  {% if diff.difficulty_warnings %}
+  <div class="diff-warn">
+    {% for w in diff.difficulty_warnings %}
+    ⚠ {{ w }}{% if not loop.last %}<br>{% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+</body>
+</html>

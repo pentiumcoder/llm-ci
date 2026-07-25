@@ -14,6 +14,7 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
+from src.alerter import send_slack_alert
 from src.comparator import compute_diff
 from src.config import Settings
 from src.cost import calculate_cost_aud, summarise_run_cost
@@ -23,6 +24,7 @@ from src.drift import check_slow_drift, get_drift_summary
 from src.feature import classify_email, load_prompt
 from src.models import CaseResult, EvalRun
 from src.providers.factory import get_provider
+from src.reporter import generate_report
 from src.scorer import compute_composite, compute_p95_latency, score_embedding, score_judge, score_keywords
 
 logger = logging.getLogger(__name__)
@@ -154,12 +156,20 @@ async def run_eval(prompt_path: str, settings: Settings) -> EvalRun:
 
     drift_runs = get_latest_runs(settings.slow_drift_window, settings.db_path)
     drift_warning = check_slow_drift(drift_runs, settings)
+    drift_msg = get_drift_summary(drift_runs, settings)
     if drift_warning:
         logger.warning("Slow drift detected for run %s", run_id)
-        drift_msg = get_drift_summary(drift_runs, settings)
         logger.warning(drift_msg)
     else:
         logger.info("No slow drift detected for run %s", run_id)
+
+    recent_runs = get_latest_runs(20, settings.db_path)
+    report_path = generate_report(
+        run, diff, drift_warning, drift_msg, recent_runs, settings.results_dir, dataset,
+    )
+    logger.info("Report generated: %s", report_path)
+
+    send_slack_alert(run, diff, report_path, settings, drift_warning)
 
     save_run(run, settings.db_path)
     logger.info("Run %s saved to %s (%d cases, %.2f%% accuracy, AUD $%.4f, status=%s)",
