@@ -1,1 +1,95 @@
-# Sprint 10
+name: Eval CI
+
+on:
+  push:
+    paths:
+      - "prompts/**"
+      - "src/**"
+  pull_request:
+    paths:
+      - "prompts/**"
+      - "src/**"
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run eval pipeline
+        id: eval
+        run: |
+          LATEST_PROMPT=$(ls -t prompts/ | head -1)
+          python -m src.runner --prompt "prompts/$LATEST_PROMPT" --output results/ 2>&1 | tee eval_output.txt
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report-${{ github.run_id }}
+          path: results/report_*.html
+          retention-days: 30
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('eval_output.txt', 'utf8');
+
+            const statusMatch = output.match(/status=(PASS|WARN|FAIL)/);
+            const accuracyMatch = output.match(/([\d.]+)% accuracy/);
+            const costMatch = output.match(/AUD \$([\d.]+)/);
+
+            const status = statusMatch ? statusMatch[1] : 'UNKNOWN';
+            const accuracy = accuracyMatch ? accuracyMatch[1] : 'N/A';
+            const cost = costMatch ? costMatch[1] : 'N/A';
+
+            const badgeColour = status === 'PASS' ? 'brightgreen' :
+                                status === 'WARN' ? 'yellow' : 'red';
+            const badge = `![${status}](https://img.shields.io/badge/status-${status}-${badgeColour})`;
+
+            const body = [
+              `## LLM-CI Eval Results ${badge}`,
+              '',
+              `| Metric | Value |`,
+              `|--------|-------|`,
+              `| Accuracy | ${accuracy}% |`,
+              `| Est. cost | AUD $${cost} |`,
+              `| Run ID | ${{ github.run_id }} |`,
+              '',
+              `[View full report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body,
+            });
+
+      - name: Fail on regression
+        if: steps.eval.outputs.exit_code == '1'
+        run: |
+          echo "Eval run returned FAIL status (exit code 1). Blocking merge."
+          exit 1

@@ -1,1 +1,16 @@
-# Sprint 10
+services:
+  eval:
+    build: .
+    env_file: .env
+    volumes:
+      - ./results:/app/results
+      - ./data:/app/data
+    entrypoint: ["python", "-m", "src.runner", "--prompt", "prompts/v1.0.0.yaml"]
+
+  dashboard:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+    entrypoint: ["streamlit", "run", "src/dashboard.py", "--server.port=8501", "--server.address=0.0.0.0"]

@@ -211,6 +211,9 @@ def main() -> None:
     run = asyncio.run(run_eval(args.prompt, settings))
     _print_summary(run)
 
+    if run.status == "FAIL":
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
