@@ -14,6 +14,14 @@ jobs:
   eval:
     runs-on: ubuntu-latest
 
+    env:
+      PROVIDER: ${{ vars.PROVIDER || 'gemini' }}
+      MODEL_UNDER_TEST: ${{ vars.MODEL_UNDER_TEST || 'gemini-3.5-flash-lite' }}
+      JUDGE_PROVIDER: ${{ vars.JUDGE_PROVIDER || 'gemini' }}
+      JUDGE_MODEL: ${{ vars.JUDGE_MODEL || 'gemini-3.5-flash-lite' }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
