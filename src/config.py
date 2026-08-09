@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     judge_provider: str = "openai"
     judge_model: str = "gpt-4o-mini"
 
+    # Gemini free-tier pacing (requests per minute)
+    gemini_requests_per_minute: int = 14
+
     # Alerting
     slack_webhook_url: str = ""
 

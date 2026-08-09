@@ -115,15 +115,6 @@ def determine_status(
         elif diff.summary_score_delta < settings.warn_summary_delta:
             has_warning = True
 
-    if diff.cost_delta_aud is not None and diff.cost_delta_aud > 0:
-        prev_cost = diff.cost_delta_aud  # need previous cost to compute pct
-        # cost_delta_aud = current - previous, so previous = current - delta
-        # but we don't have previous directly; use delta/previous ratio approach
-        # Actually we approximate: if cost increased, check percentage
-        # We can't get the exact previous cost from RunDiff, so we use absolute
-        # This is handled in the fixed threshold check via cost_delta_aud
-        pass
-
     if has_critical:
         return "FAIL"
     if has_warning:

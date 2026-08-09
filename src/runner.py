@@ -22,7 +22,8 @@ from src.dataset import load_dataset
 from src.difficulty import compute_difficulty_breakdown
 from src.drift import check_slow_drift, get_drift_summary
 from src.feature import classify_email, load_prompt
-from src.models import CaseResult, EvalRun
+from src.models import CaseResult, EvalRun, GoldenCase, PromptConfig
+from src.providers.base import BaseProvider
 from src.providers.factory import get_provider
 from src.reporter import generate_report
 from src.scorer import compute_composite, compute_p95_latency, score_embedding, score_judge, score_keywords
@@ -33,10 +34,10 @@ _MAX_CONCURRENT = 5
 
 
 async def _run_one_case(
-    case,
-    prompt_config,
-    provider,
-    settings,
+    case: GoldenCase,
+    prompt_config: PromptConfig,
+    provider: BaseProvider,
+    settings: Settings,
     semaphore: asyncio.Semaphore,
 ) -> CaseResult:
     """Run classify_email for a single case, then score the summary."""

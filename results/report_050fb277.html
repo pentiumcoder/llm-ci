@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM-CI Eval Report — 050fb277</title>
+<style>
+  :root {
+    --pass: #22c55e; --warn: #f59e0b; --fail: #ef4444;
+    --bg: #0f172a; --card: #1e293b; --border: #334155;
+    --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 2rem; line-height: 1.6; }
+  .container { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+  .badge { display: inline-block; padding: 0.2rem 0.75rem; border-radius: 4px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
+  .badge-PASS { background: var(--pass); color: #000; }
+  .badge-WARN { background: var(--warn); color: #000; }
+  .badge-FAIL { background: var(--fail); color: #fff; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem; }
+  .card h2 { font-size: 1rem; margin-bottom: 0.75rem; color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .delta-pos { color: var(--pass); }
+  .delta-neg { color: var(--fail); }
+  .delta-zero { color: var(--muted); }
+  .diff-cell { background: rgba(239,68,68,0.15); }
+  .diff-cell-amber { background: rgba(245,158,11,0.15); }
+  .diff-cell-green { background: rgba(34,197,94,0.15); }
+  .sig-yes { color: var(--warn); font-weight: 600; }
+  .sig-no { color: var(--muted); }
+  .drift-warn { background: rgba(245,158,11,0.1); border-left: 4px solid var(--warn); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1.25rem; font-size: 0.9rem; }
+  .diff-warn { background: rgba(239,68,68,0.1); border-left: 4px solid var(--fail); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1.25rem; font-size: 0.9rem; }
+  .sparkline { display: block; margin: 0.5rem auto 0; }
+  .truncate { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.25rem;">
+    <h1>LLM-CI Eval Report</h1>
+    <span class="badge badge-PASS">PASS</span>
+  </div>
+  <div class="meta">
+    Run <code>050fb277</code> &middot;
+    gemini / gemini-3.5-flash-lite &middot;
+    Prompt v1.0.0 &middot;
+    2026-08-08 13:16 UTC
+  </div>
+
+  <div class="card">
+    <h2>Scorecard</h2>
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>Current</th><th>Previous</th><th>Delta</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Accuracy</td>
+          <td class="num">76.0%</td>
+          <td class="num">77.0%</td>
+          <td class="num delta-neg">-1.0%</td>
+        </tr>
+        <tr>
+          <td>Composite Summary Score</td>
+          <td class="num">0.713</td>
+          <td class="num">0.677</td>
+          <td class="num delta-pos">+0.037</td>
+        </tr>
+        <tr>
+          <td>P95 Latency</td>
+          <td class="num">1392ms</td>
+          <td class="num">1219ms</td>
+          <td class="num delta-zero">—</td>
+        </tr>
+        <tr>
+          <td>Total Cost (AUD)</td>
+          <td class="num">$0.0243</td>
+          <td class="num">$0.0248</td>
+          <td class="num delta-neg">-0.0005</td>
+        </tr>
+        <tr>
+          <td>Cases</td>
+          <td class="num">100</td>
+          <td class="num">100</td>
+          <td class="num delta-zero">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Statistical Significance</h2>
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Z-statistic</td>
+          <td class="num">-0.167</td>
+        </tr>
+        <tr>
+          <td>P-value</td>
+          <td class="num">0.868</td>
+        </tr>
+        <tr>
+          <td>Significant</td>
+          <td class="sig-no">No</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Difficulty Breakdown</h2>
+    
+    <table>
+      <thead>
+        <tr><th>Difficulty</th><th>billing</th><th>technical</th><th>account</th><th>general</th></tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>easy</td>
+          
+          
+          <td class="num diff-cell-amber">
+            80%
+          </td>
+          
+          
+          <td class="num diff-cell-amber">
+            80%
+          </td>
+          
+          
+          <td class="num diff-cell-green">
+            100%
+          </td>
+          
+          
+          <td class="num diff-cell-amber">
+            80%
+          </td>
+          
+        </tr>
+        
+        <tr>
+          <td>medium</td>
+          
+          
+          <td class="num diff-cell-amber">
+            80%
+          </td>
+          
+          
+          <td class="num diff-cell-green">
+            100%
+          </td>
+          
+          
+          <td class="num diff-cell-amber">
+            80%
+          </td>
+          
+          
+          <td class="num diff-cell">
+            40%
+          </td>
+          
+        </tr>
+        
+        <tr>
+          <td>hard</td>
+          
+          
+          <td class="num diff-cell-green">
+            100%
+          </td>
+          
+          
+          <td class="num diff-cell-green">
+            100%
+          </td>
+          
+          
+          <td class="num diff-cell-amber">
+            80%
+          </td>
+          
+          
+          <td class="num diff-cell">
+            60%
+          </td>
+          
+        </tr>
+        
+        <tr>
+          <td>edge</td>
+          
+          
+          <td class="num diff-cell">
+            67%
+          </td>
+          
+          
+          <td class="num diff-cell-amber">
+            80%
+          </td>
+          
+          
+          <td class="num diff-cell">
+            67%
+          </td>
+          
+          
+          <td class="num diff-cell">
+            56%
+          </td>
+          
+        </tr>
+        
+      </tbody>
+    </table>
+    
+  </div>
+
+  
+  <div class="card">
+    <h2>Regression Cases (1)</h2>
+    <table>
+      <thead>
+        <tr><th>Case ID</th><th>Email</th><th>Expected</th><th>Predicted</th><th>Score</th><th>Judge Reason</th><th>Adversarial</th></tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>case_007</td>
+          <td><span class="truncate" title="Good afternoon, my company card was renewed last week and I need to update ou...">Good afternoon, my company card was renewed last week and I need to update ou...</span></td>
+          <td>billing</td>
+          <td>technical</td>
+          <td class="num">0.797</td>
+          <td>The predicted summary captures all the key information (card update, 500 error, upcoming renewal) present in the expected keywords, though it is written as a full sentence rather than a keyword list.</td>
+          <td>—</td>
+        </tr>
+        
+      </tbody>
+    </table>
+  </div>
+  
+
+  
+
+  <div class="card">
+    <h2>Accuracy Trend</h2>
+    <svg width="480" height="80" xmlns="http://www.w3.org/2000/svg">
+<rect width="480" height="80" fill="#1e293b" rx="4"/>
+<polyline points="10.0,66.0 102.0,66.0 194.0,66.0 286.0,66.0 378.0,15.4 470.0,14.0" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+<circle cx="470.0" cy="14.0" r="3" fill="#38bdf8"/>
+<text x="10" y="11" fill="#94a3b8" font-size="10">Accuracy %</text>
+<text x="470.0" y="8.0" fill="#e2e8f0" font-size="10" text-anchor="end">77.0%</text>
+<text x="10" y="78" fill="#94a3b8" font-size="9">0.0%</text>
+<text x="470" y="78" fill="#94a3b8" font-size="9" text-anchor="end">77.0%</text>
+</svg>
+  </div>
+
+  <div class="card">
+    <h2>Cost Trend (AUD)</h2>
+    <svg width="480" height="80" xmlns="http://www.w3.org/2000/svg">
+<rect width="480" height="80" fill="#1e293b" rx="4"/>
+<polyline points="10.0,66.0 102.0,66.0 194.0,66.0 286.0,66.0 378.0,15.0 470.0,14.0" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+<circle cx="470.0" cy="14.0" r="3" fill="#38bdf8"/>
+<text x="10" y="11" fill="#94a3b8" font-size="10">Cost AUD</text>
+<text x="470.0" y="8.0" fill="#e2e8f0" font-size="10" text-anchor="end">$0.0248</text>
+<text x="10" y="78" fill="#94a3b8" font-size="9">$0.0000</text>
+<text x="470" y="78" fill="#94a3b8" font-size="9" text-anchor="end">$0.0248</text>
+</svg>
+  </div>
+
+  
+
+  
+
+</div>
+</body>
+</html>

@@ -9,6 +9,7 @@ import pandas as pd
 import streamlit as st
 
 from src.config import Settings
+from src.models import EvalRun
 from src.storage import get_latest_runs
 
 logger = logging.getLogger(__name__)
@@ -17,14 +18,15 @@ _STATUS_COLOURS = {"PASS": "#22c55e", "WARN": "#f59e0b", "FAIL": "#ef4444"}
 _MAX_RUNS = 500
 
 
-def _load_runs(db_path: str) -> list[dict]:
-    """Load all eval runs from SQLite and return as a list of dicts."""
+def _load_runs(db_path: str) -> list[EvalRun]:
+    """Load all eval runs from SQLite and return as a list of EvalRun models."""
     runs = get_latest_runs(_MAX_RUNS, db_path)
-    return [r.model_dump(mode="json") for r in reversed(runs)]
+    return list(reversed(runs))
 
 
-def _build_df(records: list[dict]) -> pd.DataFrame:
-    """Convert run records into a filtered DataFrame."""
+def _build_df(runs: list[EvalRun]) -> pd.DataFrame:
+    """Convert EvalRun models into a filtered DataFrame."""
+    records = [r.model_dump(mode="json") for r in runs]
     df = pd.DataFrame(records)
     if df.empty:
         return df
@@ -122,7 +124,7 @@ def _render_composite_chart(df: pd.DataFrame) -> None:
     )
 
 
-def _render_runs_table(df: pd.DataFrame) -> None:
+def _render_runs_table(df: pd.DataFrame, runs: list[EvalRun]) -> None:
     """Render the last 20 runs table with click-to-expand case breakdown."""
     if df.empty:
         st.info("No runs recorded yet.")
@@ -147,18 +149,18 @@ def _render_runs_table(df: pd.DataFrame) -> None:
     if selected:
         idx = short_ids.index(selected)
         full_id = full_ids[idx]
-        run_record = df[df["run_id"] == full_id].iloc[0].to_dict()
+        run_record = next(r for r in runs if r.run_id == full_id)
         _render_difficulty_heatmap(run_record)
 
 
-def _render_difficulty_heatmap(run_record: dict) -> None:
+def _render_difficulty_heatmap(run: EvalRun) -> None:
     """Render a colour-styled difficulty breakdown table for the selected run."""
-    breakdown = run_record.get("difficulty_breakdown", {})
+    breakdown = run.difficulty_breakdown
     if not breakdown:
         st.caption("No difficulty breakdown available for this run.")
         return
 
-    st.subheader(f"Difficulty Breakdown — {run_record['run_id'][:8]}")
+    st.subheader(f"Difficulty Breakdown — {run.run_id[:8]}")
 
     rows = []
     for difficulty, cats in sorted(breakdown.items()):
@@ -191,8 +193,8 @@ def main() -> None:
     st.title("LLM-CI — Eval History")
 
     settings = Settings()
-    records = _load_runs(settings.db_path)
-    df = _build_df(records)
+    runs = _load_runs(settings.db_path)
+    df = _build_df(runs)
     df = _apply_filters(df)
 
     _render_summary_cards(df)
@@ -209,7 +211,7 @@ def main() -> None:
         _render_composite_chart(df)
 
     st.subheader("Run History")
-    _render_runs_table(df)
+    _render_runs_table(df, runs)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 """Tests for LLM providers, factory, and feature function."""
 
+import asyncio
 import json
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -183,17 +184,17 @@ class TestGeminiProvider:
 
     @pytest.mark.asyncio
     async def test_complete_returns_correct_schema(self):
-        provider = self._make_provider()
         mock_usage = SimpleNamespace(prompt_token_count=15, candidates_token_count=7)
         mock_response = SimpleNamespace(text="Gemini response", usage_metadata=mock_usage)
 
-        mock_model = MagicMock()
-        mock_model.generate_content_async = AsyncMock(return_value=mock_response)
-
         with patch("src.providers.gemini_provider.genai") as mock_genai:
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = mock_genai.Client.return_value
+            mock_client.aio.models.generate_content = AsyncMock(return_value=mock_response)
 
-            result = await provider.complete("system", "user", "gemini-2.0-flash")
+            from src.providers.gemini_provider import GeminiProvider
+
+            provider = GeminiProvider(_settings())
+            result = await provider.complete("system", "user", "gemini-3.5-flash-lite")
 
         assert result["text"] == "Gemini response"
         assert result["input_tokens"] == 15
@@ -207,18 +208,104 @@ class TestGeminiProvider:
 
     @pytest.mark.asyncio
     async def test_api_error_raises_provider_error(self):
-        provider = self._make_provider()
-
-        mock_model = MagicMock()
-        mock_model.generate_content_async = AsyncMock(
-            side_effect=RuntimeError("Quota exceeded")
-        )
-
         with patch("src.providers.gemini_provider.genai") as mock_genai:
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = mock_genai.Client.return_value
+            mock_client.aio.models.generate_content = AsyncMock(
+                side_effect=RuntimeError("Quota exceeded")
+            )
+
+            from src.providers.gemini_provider import GeminiProvider
+
+            provider = GeminiProvider(_settings())
 
             with pytest.raises(ProviderError, match="Gemini API call failed"):
-                await provider.complete("system", "user", "gemini-2.0-flash")
+                await provider.complete("system", "user", "gemini-3.5-flash-lite")
+
+    def test_rate_limited_detects_sdk_429(self):
+        from google.genai import errors
+
+        from src.providers.gemini_provider import _is_rate_limited
+
+        exc = errors.ClientError(
+            429,
+            {
+                "error": {
+                    "status": "RESOURCE_EXHAUSTED",
+                    "message": "Quota exceeded",
+                    "details": [{"retryInfo": {"retryDelay": "65s"}}],
+                }
+            },
+        )
+        assert _is_rate_limited(exc)
+
+    def test_rate_limited_false_for_other_errors(self):
+        from google.genai import errors
+
+        from src.providers.gemini_provider import _is_rate_limited
+
+        exc = errors.ClientError(
+            400,
+            {"error": {"status": "INVALID_ARGUMENT", "message": "Bad request"}},
+        )
+        assert not _is_rate_limited(exc)
+
+    def test_retry_delay_parses_sdk_message(self):
+        from google.genai import errors
+
+        from src.providers.gemini_provider import _retry_delay_seconds
+
+        exc = errors.ClientError(
+            429,
+            {
+                "error": {
+                    "status": "RESOURCE_EXHAUSTED",
+                    "message": "Quota exceeded",
+                    "details": [{"retryInfo": {"retryDelay": "65s"}}],
+                }
+            },
+        )
+        assert _retry_delay_seconds(exc) == 66.0
+
+    def test_retry_delay_parses_real_message(self):
+        from google.genai import errors
+
+        from src.providers.gemini_provider import _retry_delay_seconds
+
+        exc = errors.ClientError(
+            429,
+            {
+                "error": {
+                    "status": "RESOURCE_EXHAUSTED",
+                    "message": (
+                        "You exceeded your current quota. "
+                        "Please retry in 44.62191032s."
+                    ),
+                }
+            },
+        )
+        assert _retry_delay_seconds(exc) == pytest.approx(45.62, abs=0.01)
+
+    def test_retry_delay_falls_back(self):
+        from google.genai import errors
+
+        from src.providers.gemini_provider import _FALLBACK_RETRY_SECONDS, _retry_delay_seconds
+
+        exc = errors.ClientError(
+            429,
+            {"error": {"status": "RESOURCE_EXHAUSTED", "message": "No delay hint"}},
+        )
+        assert _retry_delay_seconds(exc) == _FALLBACK_RETRY_SECONDS
+
+    @pytest.mark.asyncio
+    async def test_rate_limiter_enforces_cap(self):
+        from src.providers.gemini_provider import _RateLimiter
+
+        limiter = _RateLimiter(max_calls=2, window_seconds=10.0)
+        await limiter.acquire()
+        await limiter.acquire()
+
+        with pytest.raises(TimeoutError):
+            await asyncio.wait_for(limiter.acquire(), timeout=0.2)
 
 
 # ---------------------------------------------------------------------------

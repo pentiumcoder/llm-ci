@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 
 from sentence_transformers import SentenceTransformer, util
 
@@ -28,6 +29,18 @@ Rate on a scale of 1-5:
 Respond ONLY with JSON: {{"score": <int>, "reason": "<brief>"}}"""
 
 _embed_model: SentenceTransformer | None = None
+
+
+def _parse_json_response(text: str) -> dict:
+    """Extract a JSON object from a model response, tolerating markdown fences."""
+    raw = text.strip()
+    if raw.startswith("```"):
+        raw = re.sub(r"^```(?:json)?\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw)
+    match = re.search(r"\{.*\}", raw, re.DOTALL)
+    if match is None:
+        raise ValueError(f"No JSON object found in response: {text!r}")
+    return json.loads(match.group(0))
 
 
 def _get_embed_model(model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
@@ -57,8 +70,7 @@ async def score_judge(
             user_message=prompt,
             model=settings.judge_model,
         )
-        text = response["text"]
-        parsed = json.loads(text)
+        parsed = _parse_json_response(response["text"])
         score = float(parsed.get("score", 3))
         reason = parsed.get("reason", "")
         score = max(1.0, min(5.0, score))

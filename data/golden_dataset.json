@@ -1,5 +1,1680 @@
 {
   "version": "1.0.0",
-  "created_at": "2026-07-24T17:15:27.150709Z",
-  "cases": []
+  "created_at": "2026-08-07T06:07:16.473441Z",
+  "cases": [
+    {
+      "id": "case_001",
+      "input": "Hi there, I noticed I was charged twice for my subscription this month. Can I get a refund for the extra charge please? My account email is sarah.connor@email.com.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "double charge",
+        "refund",
+        "subscription"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "A straightforward and clear duplicate charge complaint with all necessary account info provided.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_002",
+      "input": "Hello, I need to update the credit card on file for my monthly plan. The old card expired and my last payment failed. How do I change this?",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "credit card",
+        "update",
+        "failed payment"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Clear payment method update request directly related to billing maintenance.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_003",
+      "input": "Hey, I just wanted to download my invoices for Q3 and Q4 of last year for my taxes, but I cant find where to download them in my dashboard. Could you send them over?",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "invoices",
+        "download",
+        "taxes"
+      ],
+      "difficulty": "easy",
+      "tags": [
+        "typo"
+      ],
+      "notes": "Simple invoice request containing a minor typo ('cant') while remaining unambiguously about billing records.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_004",
+      "input": "Good morning. I would like to cancel my annual membership before it auto renews next week. Please confirm cancellation and let me know if I am due any prorated refund.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "cancel",
+        "auto renew",
+        "refund"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Direct cancellation and refund inquiry tied to upcoming subscription renewal.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_005",
+      "input": "Hi team, my payment went through yesterday but my account still says past due. Can you please check why my balance hasn't updated yet?",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "payment",
+        "past due",
+        "balance"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Clear payment processing and account balance update inquiry.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_006",
+      "input": "Hey team, I just noticed that my latest invoice #98234 shows a charge for the Pro tier, but I downgraded to Basic three weeks ago. Can you look into this and apply the difference as a credit to my account? Thanks.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "invoice",
+        "downgrade",
+        "overcharge",
+        "credit"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Tests the classifier's ability to distinguish a billing dispute from a general account settings request.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_007",
+      "input": "Good afternoon, my company card was renewed last week and I need to update our billing details in the portal, but every time I try to save the new expiration date, the page throws an error 500. We have an upcoming renewal due tomorrow so I want to avoid any service interruption.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "credit card",
+        "update",
+        "error",
+        "renewal"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "multi-issue",
+        "emotional"
+      ],
+      "notes": "Combines technical error messaging with a fundamental billing profile update task.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_008",
+      "input": "Hi support, I am a bit confused about my last bill. It looks like I was charged twice for the same add-on module. Also, I never received the PDF receipt in my email inbox like usual. Could someone check the ledger for me?",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "double charge",
+        "add-on",
+        "receipt",
+        "ledger"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "multi-issue",
+        "typo"
+      ],
+      "notes": "Includes both a financial discrepancy and a document request, testing multi-issue parsing under billing.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_009",
+      "input": "Hello, I cancelled my subscription back in November, yet I just saw a pending charge from your company on my bank statement this morning. This is unacceptable and needs to be refunded immediately.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "cancelled",
+        "pending charge",
+        "refund",
+        "subscription"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "emotional"
+      ],
+      "notes": "Evaluates handling of angry customer emails regarding post-cancellation charges.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_010",
+      "input": "To whom it may concern, our accounting department requires a detailed breakdown of taxes and VAT for all invoices paid throughout the last fiscal year. Can you generate a consolidated statement for us?",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "VAT",
+        "taxes",
+        "invoices",
+        "statement"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Assesses formal requests for historical financial documents rather than direct payment issues.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_011",
+      "input": "Hey team, I just noticed that the tier upgrade I requested last Tuesday seems to have triggered a double charge on my corporate card statement ending in 4092. More importantly though, why is my dashboard still showing the legacy feature set even though the payment went through immediately? I need this sorted before our sprint review tomorrow morning.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "double charge",
+        "tier upgrade",
+        "corporate card"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous",
+        "multi-issue",
+        "emotional"
+      ],
+      "notes": "Tests the classifier's ability to prioritize billing when technical and account issues are equally prominent.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_012",
+      "input": "To Whom It May Concern, regarding invoice #99214 issued on the 4th, our accounting department cannot reconcile the professional services line item with our initial contract quote. We have withheld payment pending clarification, which unfortunately caused our automated system access to be suspended this morning. Please adjust the ledger so we can settle the correct balance.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "invoice",
+        "contract quote",
+        "account suspension"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous",
+        "multi-issue"
+      ],
+      "notes": "Blends account access and contract disputes into what is fundamentally an invoice correction request.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_013",
+      "input": "So thrilled to see an extra fifty bucks taken out of my account this month when I explicitly downgraded my plan during the renewal window. Is this your way of saying goodbye to loyal customers? Fix it.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "extra charge",
+        "downgrade",
+        "renewal"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "sarcastic",
+        "emotional"
+      ],
+      "notes": "The sarcastic tone and anger might lead a simple classifier to flag this as general churn or emotional complaint rather than billing.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_014",
+      "input": "Hello support, my bank statement shows a pending transaction from your company for $450, but my internal project budget only allocated $300 for this software license. Can you tell me exactly what this extra fee covers so I can update my expense report before submitting it to finance?",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "pending transaction",
+        "expense report",
+        "extra fee"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous",
+        "vague"
+      ],
+      "notes": "Frames the issue around expense reporting and budgeting, making the core billing inquiry less direct.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_015",
+      "input": "Hi there, I accidentaly paid for the annual subscrption instead of monthly because the button layout was confusing on mobile. Can you reverse the charge and switch me to the monthly plan instead? Thanks, Marcus.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "annual subscription",
+        "reverse charge",
+        "monthly plan"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "typo",
+        "ambiguous"
+      ],
+      "notes": "Combines a UI/UX complaint with a direct request for a financial refund and subscription adjustment.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_016",
+      "input": "me cobraon dos vecez este mes q pasa con eso?? necesito mi plata de vuelta yaaaa",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "double",
+        "charge",
+        "refund"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "typo",
+        "emotional",
+        "short"
+      ],
+      "notes": "Tests the classifier's ability to handle mixed Spanish/English slang, typos, and high emotion regarding a duplicate charge.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_017",
+      "input": "Just checked my statements and noticed a discrepancy. Not sure if it's your system or my bank acting up, but either way, my balance looks completely wrong since the last update. Can someone look into the backend logs or whatever?",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "statement",
+        "discrepancy",
+        "balance"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "ambiguous",
+        "vague"
+      ],
+      "notes": "Tests handling of vague technical language that could easily be misclassified as a technical support bug report rather than a financial balance issue.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_018",
+      "input": "Oh fantastic, another month, another mysterious charge I definitely authorized in my sleep. Truly appreciate the surprise donation I apparently made to your company.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "charge",
+        "unauthorized",
+        "surprise"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "sarcastic",
+        "emotional"
+      ],
+      "notes": "Evaluates the classifier's robustness against heavy sarcasm when complaining about unexpected subscription charges.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_019",
+      "input": "?",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "invoice",
+        "question",
+        "blank"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "short",
+        "vague"
+      ],
+      "notes": "Extremely short input with zero context, which usually requires historical context or defaults to billing due to user behavior patterns.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_020",
+      "input": "Hey team, my account was debited yesterday for the annual plan, but I downgraded to monthly three weeks ago. Also, the app keeps crashing when I try to export data, but honestly the money thing is more pressing right now.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "debited",
+        "annual",
+        "downgrade",
+        "refund"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multi-issue",
+        "ambiguous"
+      ],
+      "notes": "A multi-issue email where technical and billing overlap, testing if the classifier correctly prioritizes the financial transaction.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_021",
+      "input": "Hey support team, I cannot log into my account. Every time I put in my password, it says invalid credentials even though I just reset it yesterday. Can you please check my account?",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "login",
+        "password",
+        "account"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "A straightforward login issue with clear keywords making classification unambiguous.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_022",
+      "input": "Hi there, your mobile app keeps crashing every single time I try to open the profile settings page. I am using an iPhone 13 with the latest iOS update. Please fix this bug soon.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "app",
+        "crashing",
+        "settings"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Clearly states a software bug and device details, typical of a standard technical support ticket.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_023",
+      "input": "Hello, my website is showing a 504 Gateway Timeout error whenever visitors try to load the homepage. This started happening about an hour ago and is losing us traffic.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "website",
+        "error",
+        "timeout"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Mentions a specific HTTP error code, making the technical classification undeniable.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_024",
+      "input": "Good morning, I am trying to export my monthly report to CSV format, but the download button is completely unresponsive. I tried using both Chrome and Firefox with the same result.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "export",
+        "download",
+        "button"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Describes a UI malfunction with browser troubleshooting steps included.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_025",
+      "input": "Hi, i am having truble connecting my bluetooth printer to the desktop app. It wont sync at all and keeps saying device not found. Pls help.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "printer",
+        "bluetooth",
+        "sync"
+      ],
+      "difficulty": "easy",
+      "tags": [
+        "typo"
+      ],
+      "notes": "Includes mild typos ('truble', 'wont', 'Pls') while remaining distinctly a hardware and software integration issue.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_026",
+      "input": "Hey team, ever since the update pushed out yesterday morning, my dashboard keeps spinning and won't load any analytics. I've tried clearing my cache and using three different browsers (Chrome, Safari, and Firefox), but nothing seems to work. We have a client meeting in two hours and I really need this data. Is there a temporary fix or roll back I can do?",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "dashboard",
+        "update",
+        "analytics",
+        "loading"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "ambiguous",
+        "emotional"
+      ],
+      "notes": "Tests the model's ability to handle time-sensitive emotional tone while correctly identifying a core software/dashboard bug.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_027",
+      "input": "Hello support, my API integration is returning a 500 internal server error every time I try to POST new user data to the endpoint. The payload structure hasn't changed on my end in months, so I'm wondering if something changed on your servers. Here is a snippet of the error log: 'Error 500: Internal Server Error at processRequest'. Please advise.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "API",
+        "500",
+        "error",
+        "integration"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Evaluates technical terminology processing and differentiation between standard support and developer-focused API issues.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_028",
+      "input": "Hi there, I forgot to mention in my last message that my password reset link is coming through, but when I click it, it says the token is expired even though I requested it ten seconds ago. Also, the mobile app keeps logging me out randomly every few minutes. Can someone look into my account settings?",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "password",
+        "token",
+        "expired",
+        "mobile app"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "multi-issue"
+      ],
+      "notes": "Combines multiple technical problems into a single request to test multi-issue handling.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_029",
+      "input": "Good afternoon, I am trying to export my monthly financial report to a CSV file, but the file downloads completely blank. I checked the filters and everything looks correct on screen. Could this be a bug with the export tool?",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "export",
+        "CSV",
+        "blank",
+        "bug"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Tests whether the model can distinguish a software bug from a general data or billing inquiry.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_030",
+      "input": "Hey support, my webhook subscriptions stopped working suddenly. I am not recieving any events on my server since last night. Did something change with the payload format or auth headers?",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "webhook",
+        "subscriptions",
+        "events",
+        "server"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "typo"
+      ],
+      "notes": "Includes a minor spelling typo ('recieving') to test resilience against imperfect user input.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_031",
+      "input": "Hey team, ever since that last update dropped on Tuesday, my dashboard keeps timing out whenever I try to export the Q3 metrics as a CSV. It just spins for ten minutes and then gives me a 504 Gateway Time-out. I've already cleared my cache and tried three different browsers, so it's definitely on your end. Can you look into the database queries or whatever is backing this export service?",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "dashboard",
+        "timeout",
+        "export",
+        "504 error"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous",
+        "multi-issue"
+      ],
+      "notes": "Requires distinguishing between a general user complaint and a specific system performance failure masquerading as an account or billing inquiry.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_032",
+      "input": "So the sync between our CRM and your platform has gone completely rogue again. Deals closed in Salesforce are showing up as lost leads in your system, and worse, it triggered automated emails to clients who actually renewed. This is a disaster for our client relations right now. Please fix whatever API webhook is dropping these payloads immediately.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "sync",
+        "CRM",
+        "Salesforce",
+        "API webhook"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "emotional",
+        "ambiguous"
+      ],
+      "notes": "Presents with high emotional frustration about business impact, which could easily be misclassified as a customer success or sales issue instead of a backend API failure.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_033",
+      "input": "Hi support, I'm trying to setup the SSO integration using SAML 2.0 with Azure AD for our enterprise domain. I followed all the steps in your documentation, but when users try to log in, it throws an invalid_signature error during the token validation phase. Our IdP cert is definitely valid and uploaded correctly. Any ideas what metadata attribute I might be missing?",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "SSO",
+        "SAML",
+        "Azure AD",
+        "invalid_signature"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Involves enterprise authentication configuration that requires deep technical domain knowledge to separate from a standard login or password reset request.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_034",
+      "input": "We are getting constant CORS errors in the browser console when trying to fetch the widget data from our staging environment. Our domain is whitelisted in the portal settings, but it seems like your access-control-allow-origin headers are not being returned properly on preflight OPTIONS requests. Need this resolved before our demo to investors tomorrow.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "CORS",
+        "browser console",
+        "headers",
+        "staging environment"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "typo",
+        "ambiguous"
+      ],
+      "notes": "Contains highly specific web development jargon that requires recognizing backend header misconfigurations rather than a general web UI complaint.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_035",
+      "input": "Hello, our webhook listener stopped receiving payload events altogether around 2 PM EST. We checked our server logs and nothing came through, no retries either. Is there an outage on your message queue infrastructure, or did our endpoint get automatically disabled due to a previous rate limit?",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "webhook listener",
+        "payload events",
+        "server logs",
+        "outage"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Borders on infrastructure monitoring and operations support, testing the classifier's ability to handle backend event delivery issues.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_036",
+      "input": "UR APP IS TRASH FIX IT NOW!!!!",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "app",
+        "broken",
+        "fix",
+        "crash"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "short",
+        "emotional",
+        "vague"
+      ],
+      "notes": "Extremely short and emotionally charged text tests the classifier's ability to identify technical distress without descriptive details.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_037",
+      "input": "Depuis ce matin, impossible de me connecter à mon espace client. Ça me met une erreur 502 tout le temps, vous pouvez faire quelque chose ?",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "connexion",
+        "erreur",
+        "502",
+        "compte"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual"
+      ],
+      "notes": "Completely in French, this email tests the classifier's multilingual capability for routing technical server errors.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_038",
+      "input": "So my screen just went completely purple while I was editing a video, and now the fan sounds like a jet engine taking off. Is this a sign of the subscription renewing early or what?",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "screen",
+        "purple",
+        "fan",
+        "hardware"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "ambiguous",
+        "sarcastic"
+      ],
+      "notes": "Sarcastic framing mentioning a billing concept while describing severe hardware and display malfunctions challenges category distinction.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_039",
+      "input": "Hey team, my password isnt working anymore and also I think I was overcharged on my last invoice, but mainly I cant access the dashboard at all to cancel my plan.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "password",
+        "dashboard",
+        "access",
+        "login"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multi-issue",
+        "typo"
+      ],
+      "notes": "Contains multiple issues spanning billing, account management, and technical login failure, requiring the model to weigh the primary access blocker.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_040",
+      "input": "idk what happened but every time i click the blue button it just spins forever lol fix plz",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "button",
+        "loading",
+        "infinite",
+        "spin"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "short",
+        "typo",
+        "vague"
+      ],
+      "notes": "Informal slang, lack of punctuation, and typos test the classifier's robustness against extremely casual user input.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_041",
+      "input": "Hi there, I need to update the email address associated with my profile because my old work inbox is going to be deactivated soon. Can you help me switch it to my personal address?",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "update",
+        "email address",
+        "profile"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "A straightforward request to change account details with no ambiguity.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_042",
+      "input": "Please delete my account and all associated personal data immediately. I no longer use your service and want everything scrubbed from your servers.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "delete",
+        "account",
+        "data"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Clear account closure and data deletion request.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_043",
+      "input": "Hello support, I forgot my password and the reset link is not arriving in my inbox. Could you please help me regain access to my account?",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "password reset",
+        "access",
+        "account"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Standard password recovery and account access issue.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_044",
+      "input": "Hey, I tried to log in today and it says my account is locked. I think someone tried to hack it becuse I got a weird notification yesterday. Please unlock it for me.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "locked",
+        "account",
+        "unlock"
+      ],
+      "difficulty": "easy",
+      "tags": [
+        "typo"
+      ],
+      "notes": "Contains a minor typo ('becuse') while clearly remaining an account lockout issue.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_045",
+      "input": "Good afternoon, I want to change my username on the platform. Is it possible to transfer my current subscription and history to a new username without losing anything?",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "username",
+        "change",
+        "history"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Inquiry regarding profile customization and account settings migration.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_046",
+      "input": "Hey team, I was trying to update my billing address because I just moved across town, but the system keeps throwing an error code when I hit save. Also, I noticed my last invoice has my old name on it instead of my maiden name since I got married recently. Can someone help me sort this out before the next renewal date?",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "billing address",
+        "name change",
+        "error"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "ambiguous",
+        "multi-issue"
+      ],
+      "notes": "Tests the classifier's ability to handle multiple profile-related updates spanning both billing and personal details.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_047",
+      "input": "Hello, I am reaching out regarding my subscription plan. I thought I canceled it three months ago, but I just saw a charge on my bank statement for this month. Could you please check my account status and let me know why it was active?",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "subscription",
+        "canceled",
+        "charge"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "emotional"
+      ],
+      "notes": "Evaluates handling of billing inquiries that stem directly from subscription and account status confusion.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_048",
+      "input": "Hi support, my email provider changed last week, so I no longer have access to the inbox linked to my user profile here. How can I migrate my login credentials to my new email address without losing my purchase history?",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "email address",
+        "login",
+        "migrate"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Tests recognition of profile security and credential management as core account tasks.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_049",
+      "input": "Good morning. I am trying to login to my dashboard today, but it keeps saying my account is locked due to too many failed attempts. I was traveling abroad, so maybe that triggered some security flag. Please unlock it for me as soon as possible.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "locked",
+        "login",
+        "security"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Assesses classification when security triggers lock a user out of their account.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_050",
+      "input": "Dear Customer Support, I want to delete my profile completely from your database in accordance with privacy regulations. Can you confirm when my data will be permanently wiped?",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "delete",
+        "profile",
+        "privacy"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "formal"
+      ],
+      "notes": "Validates proper routing of account deletion and privacy-related user requests.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_051",
+      "input": "Hey, so I've been trying to merge my old profile with this new one because my work email changed, but the system keeps throwing a 409 conflict error. Also, can you make sure my active billing cycle transfers over? I really don't want to get charged twice for the same month.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "merge",
+        "profiles",
+        "billing",
+        "error"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous",
+        "multi-issue"
+      ],
+      "notes": "Combines technical system errors and billing concerns, but fundamentally requires account merging and profile management.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_052",
+      "input": "Bonjour, je n'arrive plus à me connecter depuis que j'ai mis à jour mes coordonnées bancaires et mon mot de passe. C'est urgent, j'ai besoin d'accéder à mes documents avant ce soir.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "connexion",
+        "mot de passe",
+        "coordonnées",
+        "accès"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "multilingual",
+        "emotional"
+      ],
+      "notes": "Tests the classifier's ability to handle French language input related to account access and profile updates.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_053",
+      "input": "My subscription renews tomorrow, but my dashboard still shows my maiden name and an inactive status even though I paid the invoice last week. Can someone please fix this backend mismatch before my team tries to log in?",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "dashboard",
+        "name",
+        "status",
+        "subscription"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous",
+        "emotional"
+      ],
+      "notes": "Blends billing/payment verification with profile details and platform status, requiring inference that it is an account management issue.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_054",
+      "input": "i keep getting locked out every time i try to update my security settings or recovery email. fix pls.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "locked out",
+        "security",
+        "recovery email",
+        "update"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "typo",
+        "short"
+      ],
+      "notes": "Features lowercase typing, minor grammar informality, and focuses on security settings which are core account management functions.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_055",
+      "input": "Transferring ownership of our corporate workspace has been a nightmare. The previous admin left the company on bad terms, and her personal credentials are still tied to the root directory. We need to reclaim control immediately without losing our historical data.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "ownership",
+        "admin",
+        "workspace",
+        "transfer"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "emotional",
+        "ambiguous"
+      ],
+      "notes": "Sounds like a high-level organizational dispute or data recovery task, but fundamentally resolves to administrative account ownership transfer.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_056",
+      "input": "Mi cuenta esta bloqueada otra vez y nadie me ayuda. Por favor necesito arreglar esto ya.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "cuenta",
+        "bloqueada",
+        "ayuda"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "emotional",
+        "short"
+      ],
+      "notes": "Tests the classifier's ability to handle foreign language input (Spanish) regarding account access.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_057",
+      "input": "oh fantastic, locked out again for the third time this week. guess my subscription fee just pays for endless password resets instead of actual service. fix it.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "locked out",
+        "password",
+        "access"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "sarcastic",
+        "emotional"
+      ],
+      "notes": "Evaluates handling of heavy sarcasm combined with account lockout issues.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_058",
+      "input": "Can u delete my old profile and merge my points? Btw my email was changed to sara.k@mail.com last week and nothing is working right.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "profile",
+        "merge",
+        "email changed"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "typo",
+        "multi-issue",
+        "ambiguous"
+      ],
+      "notes": "Tests classification when profile merging and email updates overlap with informal slang and typos.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_059",
+      "input": "sup",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "vague",
+        "greeting",
+        "user"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "short",
+        "vague"
+      ],
+      "notes": "Extremely short and ambiguous input tests if the classifier defaults to account context or requires more info.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_060",
+      "input": "So I tried to update my billing address in the portal, but it keeps throwing error code 500. Now my login credentials aren't recognized either, and I am not sure if my membership is even active or if my profile got wiped.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "login",
+        "profile",
+        "error",
+        "membership"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multi-issue",
+        "ambiguous",
+        "emotional"
+      ],
+      "notes": "Blurs the line between billing, technical errors, and core account profile management.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_061",
+      "input": "Hi team, I just wanted to ask what your normal business hours are? I couldn't find them anywhere on the website and need to drop something off.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "business hours",
+        "schedule",
+        "website"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "A straightforward inquiry about company operations that falls squarely into the general category.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_062",
+      "input": "Hello, could you please tell me if you guys offer any kind of military discount? My son mentioned it might be a possibility.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "military discount",
+        "eligibility",
+        "offer"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Simple question about company policies regarding discounts.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_063",
+      "input": "Good afternoon, I am looking for a contact person in your public relations department. We would like to feature your company in an upcoming tech blog post.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "public relations",
+        "media",
+        "contact"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "Standard media inquiry that needs to be routed away from customer support to PR.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_064",
+      "input": "Hey there, do you guys have a physical store located near downtown Chicago? I prefer to shop in person when I can.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "physical store",
+        "Chicago",
+        "location"
+      ],
+      "difficulty": "easy",
+      "tags": [
+        "typo"
+      ],
+      "notes": "Basic location question with minor casual phrasing suitable for testing general classification.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_065",
+      "input": "Hi support, just wanted to say thank you for the wonderful service I received last week. Your team went above and beyond to help me out.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "thank you",
+        "positive feedback",
+        "appreciation"
+      ],
+      "difficulty": "easy",
+      "tags": [],
+      "notes": "A purely positive feedback message that does not fit technical support or billing disputes.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_066",
+      "input": "Hi team, I was wondering if you guys could tell me when your offices are actually open during the upcoming holiday week? Also, do you have a parking lot available if I need to drop something off in person, or should I just use street parking? Thanks, Marcus Vance.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "holiday hours",
+        "parking",
+        "office visit"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "multi-issue",
+        "ambiguous"
+      ],
+      "notes": "Combines a standard inquiry about holiday hours with a secondary logistical question about parking.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_067",
+      "input": "Hello, I updated my account details yesterday, but I wanted to make sure everything went through properly on your end. Could you confirm my current mailing address and phone number are correct in your system? My account ID is 88492. Best regards, Clara.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "account details",
+        "address",
+        "confirmation"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Bvers the line between technical account management and general administrative verification.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_068",
+      "input": "To whom it may concern, I am trying to figure out if your company offers any kind of discount programs for non-profit organizations or educational institutions. We are looking to potentially partner up or utilize your services for an upcoming community outreach project. Please let me know what options might be available. Sincerely, Dr. Henderson.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "discount",
+        "non-profit",
+        "partnership"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Touches on sales and partnerships but fundamentally asks a general informational question about programs.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_069",
+      "input": "Hey there, just had a quick question about your company history and whether you are publicly traded or privately owned. Im doing a bit of research for a college assignment and couldnt find this info on the main webpage. Thanks for any help you can provide!",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "company history",
+        "ownership",
+        "research"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "typo",
+        "ambiguous"
+      ],
+      "notes": "Includes minor typos and an unusual request from a student that does not fit standard customer support categories.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_070",
+      "input": "Good afternoon, I am reaching out to see if you have any open positions for remote project managers currently listed on your careers page. I tried looking earlier today, but the search tool on the website kept giving me an error message. Appreciate your guidance on this, Sarah Jenkins.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "job openings",
+        "careers",
+        "remote"
+      ],
+      "difficulty": "medium",
+      "tags": [
+        "multi-issue",
+        "ambiguous"
+      ],
+      "notes": "Mentions a website error but is ultimately a general HR and career inquiry.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_071",
+      "input": "Hey team, just wanted to check on the status of things regarding my account update. I submitted the paperwork last Tuesday and haven't heard a peep. Not sure if it got lost in the shuffle or if someone is still looking at it. Let me know what the next steps are when you get a chance.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "account",
+        "update",
+        "paperwork",
+        "status"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous",
+        "vague"
+      ],
+      "notes": "Useful because it blends account management inquiry with general status checking without specifying a distinct department.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_072",
+      "input": "Hello support, I was looking over my dashboard today and realized I might need to change how my profile is structured moving forward. Is there a guide or documentation you guys recommend reading before I start making changes? Also, do you have any weekend availability for chat support just in case things break?",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "dashboard",
+        "documentation",
+        "guide",
+        "support"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous",
+        "multi-issue"
+      ],
+      "notes": "Tests the classifier's ability to handle a broad instructional inquiry that touches on multiple hypothetical areas.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_073",
+      "input": "Hi there, I am trying to figure out if your platform supports integration with third-party calendar apps, specifically Google Calendar and Outlook. I couldn't find anything definitive in the FAQ section. If you have a whitepaper or a roadmap you could share, that would be awesome.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "integration",
+        "calendar",
+        "platform",
+        "documentation"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Evaluates handling of pre-sales or product capability questions that often masquerade as technical support requests.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_074",
+      "input": "Greetings, my team and I have been evaluating your software for a potential company-wide rollout next quarter. We have a few high-level questions about data governance policies and whether you offer custom training sessions for enterprise clients. Who is the best person to talk to about this?",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "enterprise",
+        "training",
+        "governance",
+        "rollout"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Important for ensuring high-level inquiries about enterprise features and routing are not misclassified as sales or billing.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_075",
+      "input": "Good afternoon, I am reaching out because my colleague Marcus usually handles our subscription renewals, but he is out of office this week. Can you tell me when our current billing cycle ends and if we are locked into any auto-renewal terms? Thanks for your help.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "subscription",
+        "renewal",
+        "billing",
+        "cycle"
+      ],
+      "difficulty": "hard",
+      "tags": [
+        "ambiguous"
+      ],
+      "notes": "Tricky because it mentions billing and subscription terms, but functions primarily as a general administrative inquiry from a proxy user.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_076",
+      "input": "k",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "acknowledgment",
+        "brief",
+        "response"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "short",
+        "vague"
+      ],
+      "notes": "Extremely short input tests the classifier's ability to handle minimal-content messages without crashing or misclassifying.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_077",
+      "input": "Hola, necesito saber como cambiar mis datos por favor. Gracias.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "account",
+        "update",
+        "information"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "ambiguous"
+      ],
+      "notes": "Non-English input tests multilingual classification capabilities for a general inquiry.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_078",
+      "input": "Oh sure, because having my entire afternoon wasted while waiting for nothing is just fantastic. Love how easy it is to get any answers around here. NOT.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "frustration",
+        "delay",
+        "complaint"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "sarcastic",
+        "emotional"
+      ],
+      "notes": "Heavy sarcasm and emotional tone test if the model can look past the anger to identify it as a general complaint rather than a specific technical issue.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_079",
+      "input": "Hey there! So I was wondering if you guys do any kind of student discounts or if that's just a rumor I heard on the internet? Also, what time do your phones close today? Thx!",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "discount",
+        "hours",
+        "inquiry"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multi-issue",
+        "ambiguous"
+      ],
+      "notes": "Multiple unrelated casual questions test the model's ability to categorize mixed general inquiries.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_080",
+      "input": "Wudup, jus wanted to kno if u guys ship internationally or if u only do domestic orders? LMK when u get a sec.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "shipping",
+        "international",
+        "inquiry"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "typo",
+        "short"
+      ],
+      "notes": "Heavy use of slang and typos tests the model's robustness against non-standard English in general questions.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_081",
+      "input": "Subject: Account suspended over unpaid invoice error\n\nHi Support, my account has been completely locked down and I am seeing an unpaid invoice block when I try to run our server instance. I need you to reverse this charge immediately so my database cluster stops failing its scheduled backups and I can access my API keys again.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "server instance",
+        "database cluster",
+        "API keys"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "adversarial"
+      ],
+      "notes": "Uses misleading subject line and invoice vocabulary to mask an infrastructure lockout and database backup failure.",
+      "adversarial_target": "billing"
+    },
+    {
+      "id": "case_082",
+      "input": "Subject: Refund for broken payment gateway integration\n\nI want my money back because your checkout module keeps throwing a 500 internal server error on the callback URL. We paid for the enterprise tier expecting the API webhook to process transactions, but the payload parsing is completely broken.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "checkout module",
+        "server error",
+        "webhook"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "adversarial"
+      ],
+      "notes": "Leads with refund and payment demands to trick the classifier, while the actual issue is a 500 error in an API webhook integration.",
+      "adversarial_target": "billing"
+    },
+    {
+      "id": "case_083",
+      "input": "Subject: API Key Revoked After System Crash\n\nHi Support,\n\nMy system crashed this morning during a webhook sync, and now my OAuth client secret and database connection strings are failing to authenticate. I keep getting 401 unauthorized errors in my terminal. Could you please reset my dashboard credentials and verify my subscription tier? It seems my billing profile might be locked out, which is why my API calls are failing.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "subscription",
+        "billing profile",
+        "credentials"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "adversarial"
+      ],
+      "notes": "Uses heavy technical API and error vocabulary while the actual core request is to fix a locked billing profile and subscription status.",
+      "adversarial_target": "technical"
+    },
+    {
+      "id": "case_084",
+      "input": "Subject: SSL Certificate Expiring / Portal Access Error\n\nHello Team,\n\nI need immediate assistance with a protocol handshake failure. When I try to execute the deployment script, my authorization token gets rejected and I am locked out of the enterprise gateway. I need you to update my company profile name and reactivate my user seat on the platform immediately so my dev team can get back in.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "user seat",
+        "company profile",
+        "reactivate"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "adversarial"
+      ],
+      "notes": "Starts with misleading technical server terminology like SSL and protocol failures to trick the classifier, but concludes with an explicit request to update account user seats and company profiles.",
+      "adversarial_target": "technical"
+    },
+    {
+      "id": "case_085",
+      "input": "Subject: Profile Locked After Last Invoice Payment\n\nHi Support,\n\nI tried to log into my profile this morning to check my dashboard, but it says my user access is completely frozen. I need you to unlock my user settings immediately because I just paid my monthly invoice yesterday and need to access my subscription features. Please fix my login credentials so I can get back into my account.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "invoice",
+        "payment",
+        "access"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "adversarial"
+      ],
+      "notes": "Uses heavy account-related vocabulary like profile, login, and credentials while the root issue stems from a payment event.",
+      "adversarial_target": "account"
+    },
+    {
+      "id": "case_086",
+      "input": "Subject: Password Reset / Charge Dispute\n\nHello Team,\n\nI need a password reset link sent to my email right away because I cannot get past the security gateway. While you are fixing my profile access and updating my security settings, I also noticed an unauthorized charge on my last statement that needs a refund.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "charge",
+        "refund",
+        "statement"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "adversarial"
+      ],
+      "notes": "Topic switching mid-email where the primary actionable request is a financial refund, but it opens and closes with account security demands.",
+      "adversarial_target": "account"
+    },
+    {
+      "id": "case_087",
+      "input": "Subject: Account upgrade inquiry regarding our company profile settings. Hello team, I wanted to check on the status of my subscription tier because my dashboard interface still reflects the legacy plan despite my recent company updates. More importantly, I need a copy of my recent transaction history and tax invoices sent to our accounting department as soon as possible. Thank you.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "invoices",
+        "tax",
+        "transaction"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "adversarial"
+      ],
+      "notes": "Starts with a heavy emphasis on account settings and profile updates to trick the classifier into a general inquiry, while the core actionable request is strictly about financial invoices.",
+      "adversarial_target": "general"
+    },
+    {
+      "id": "case_088",
+      "input": "Hey support, I am writing to ask how I can update my main contact email and reset my security password on the portal. Once that is sorted, can you also explain why my recurring monthly charges failed yesterday and help me update my expired credit card on file?",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "charges",
+        "credit card",
+        "monthly"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "adversarial"
+      ],
+      "notes": "Uses a topic-switching technique where the email opens with standard general support requests about passwords and profiles before pivoting to payment failures at the end.",
+      "adversarial_target": "general"
+    },
+    {
+      "id": "case_089",
+      "input": "Subject: API error 500 on my billing dashboard\n\nHi team, whenever I try to access my account settings to update my subscription plan, the page throws a critical server exception and gateway timeout. Can someone look into this database routing failure?",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "subscription",
+        "account",
+        "plan"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "adversarial"
+      ],
+      "notes": "Uses heavy technical error terminology to describe a routine subscription plan update issue.",
+      "adversarial_target": "technical"
+    },
+    {
+      "id": "case_090",
+      "input": "Subject: Urgent: System crash during onboarding protocol\n\nHello, I am trying to complete my profile setup and upload my company logo. The system keeps freezing up and throwing code errors. I just want to know how to change my display name and profile picture.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "profile",
+        "setup",
+        "display name"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "adversarial"
+      ],
+      "notes": "Leads with alarming system crash and code error vocabulary to disguise a simple profile picture update request.",
+      "adversarial_target": "technical"
+    },
+    {
+      "id": "case_091",
+      "input": "Bonjour, je ne comprends pas pourquoi j'ai été prélevé deux fois ce mois-ci pour mon abonnement. Pourriez-vous vérifier ma facture et me rembourser ?",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "charged",
+        "invoice",
+        "refund"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "non-english"
+      ],
+      "notes": "This French email discusses a duplicate subscription charge and asks for a refund, which clearly falls under billing.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_092",
+      "input": "Hola, mi tarjeta fue debitada por error ayer pero mi cuenta sigue apareciendo como impaga. Necesito que solucionen este cobro urgente.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "card",
+        "charged",
+        "payment"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "non-english"
+      ],
+      "notes": "This Spanish email reports an incorrect card debit and an unpaid account status issue, making it a billing inquiry.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_093",
+      "input": "مرحباً، لقد تلقيت فاتورة بقيمة أعلى من المتفق عليها في خطتي الشهرية. أرجو تصحيح هذا المبلغ في أقرب وقت.",
+      "expected_category": "billing",
+      "expected_summary_keywords": [
+        "invoice",
+        "amount",
+        "plan"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "non-english"
+      ],
+      "notes": "This Arabic email complains about receiving an invoice with an incorrect, higher amount than agreed, which belongs to billing.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_094",
+      "input": "Hola equipo de soporte, desde ayer por la tarde nuestra API principal devuelve un error 500 cada vez que intentamos procesar pagos recurrentes, lo cual está bloqueando la facturación a nuestros clientes.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "API",
+        "error 500",
+        "payments"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "non-english"
+      ],
+      "notes": "This Spanish email describes a server error and API failure, making technical the correct category.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_095",
+      "input": "こんにちは。弊社のダッシュボード画面において、SSO（シングルサインオン）連携を設定した際になぜか「Invalid_Grant」というエラーコードが表示され、従業員が誰もログインできなくなっています。早急な確認をお願いします。",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "SSO",
+        "error code",
+        "login"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "non-english"
+      ],
+      "notes": "This Japanese email details an SSO configuration error preventing user logins, which falls under technical support.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_096",
+      "input": "Bonjour le support technique, nous subissons une panne critique : les webhooks ne se déclenchent plus sur notre serveur de staging, ce qui perturbe l'ensemble de notre pipeline de développement.",
+      "expected_category": "technical",
+      "expected_summary_keywords": [
+        "webhooks",
+        "server",
+        "outage"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "non-english"
+      ],
+      "notes": "This French email reports a server outage regarding webhooks affecting the development pipeline, confirming the technical category.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_097",
+      "input": "Hola, necesito ayuda urgente porque no puedo acceder a mi perfil de usuario y la contraseña nueva no llega a mi correo.",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "login",
+        "password",
+        "access"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "non-english"
+      ],
+      "notes": "The user cannot access their user profile and did not receive a password reset email, which directly relates to account management.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_098",
+      "input": "こんにちは。マイアカウントにログインできなくなってしまいました。登録情報の変更もできないのでサポートをお願いします。",
+      "expected_category": "account",
+      "expected_summary_keywords": [
+        "login",
+        "profile",
+        "support"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "non-english"
+      ],
+      "notes": "The customer states they cannot log into their account and cannot change their registration info, making account the correct category.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_099",
+      "input": "Bonjour, je voulais juste vous faire part de mon avis général sur votre entreprise et vous remercier pour votre présence sur le marché.",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "feedback",
+        "general",
+        "company"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "non-english"
+      ],
+      "notes": "This email contains general feedback and appreciation for the company rather than a specific support request, making general the correct category.",
+      "adversarial_target": null
+    },
+    {
+      "id": "case_100",
+      "input": "こんにちは。貴社のサービス全般について、今後の展開やビジョンを知りたいと思いご連絡しました。",
+      "expected_category": "general",
+      "expected_summary_keywords": [
+        "inquiry",
+        "services",
+        "vision"
+      ],
+      "difficulty": "edge",
+      "tags": [
+        "multilingual",
+        "non-english"
+      ],
+      "notes": "This email asks a general inquiry about the company's overall services and vision without tying into technical support or billing issues.",
+      "adversarial_target": null
+    }
+  ],
+  "metadata": {
+    "generator_model": "gemini-3.5-flash-lite",
+    "prompt_version": "1.0.0",
+    "temperature": 0.9,
+    "generation_timestamp": "2026-08-07T06:07:16.473382Z",
+    "total_api_calls": 25,
+    "total_input_tokens": 7781,
+    "total_output_tokens": 14469,
+    "estimated_cost_aud": 0.059686,
+    "generation_mode_counts": {
+      "standard": 80,
+      "adversarial": 10,
+      "multilingual": 10
+    }
+  }
 }

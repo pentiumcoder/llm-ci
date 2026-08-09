@@ -5,7 +5,7 @@ CI/CD pipeline that tests LLM-powered features against a 100-case golden dataset
 ## Setup
 
 1. Clone the repo and `cd llm-ci`
-2. Create `.env` with `OPENAI_API_KEY` and `SLACK_WEBHOOK_URL`
+2. Create `.env` with a provider API key (`GEMINI_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`) and `SLACK_WEBHOOK_URL`. See `src/config.py` for the full list of settings.
 3. `pip install -r requirements.txt`
 4. `python -m src.runner --prompt prompts/v1.0.0.yaml` — runs the eval pipeline
 5. Open `results/report_*.html` for the diff report
@@ -19,7 +19,7 @@ Edit `data/golden_dataset.json`. Add an object to the `cases` array with these f
 
 ## Switching providers
 
-Set `PROVIDER=anthropic` (or `gemini`) in `.env`. The runner automatically selects the correct provider class via `src/providers/factory.py`. No code changes needed. Each provider maps to a specific model: OpenAI → `gpt-4o-mini`, Anthropic → `claude-haiku-4-5`, Gemini → `gemini-2.0-flash`.
+Set `PROVIDER=anthropic` (or `gemini`) in `.env`. The runner automatically selects the correct provider class via `src/providers/factory.py`. No code changes needed. Each provider maps to a specific model: OpenAI → `gpt-4o-mini`, Anthropic → `claude-haiku-4-5`, Gemini → `gemini-3.5-flash-lite`. Gemini is the recommended free-tier option.
 
 ## Adjusting thresholds
 

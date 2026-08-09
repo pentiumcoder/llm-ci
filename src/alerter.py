@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import logging
 import urllib.request
-from typing import Any
 
 from src.config import Settings
 from src.models import EvalRun, RunDiff
@@ -37,7 +36,7 @@ def send_slack_alert(
         else ""
     )
 
-    blocks: list[dict[str, Any]] = [
+    blocks: list[dict] = [
         {
             "type": "header",
             "text": {"type": "plain_text", "text": f"LLM-CI Eval Run: {run.status}"},
@@ -55,18 +54,23 @@ def send_slack_alert(
             ],
         },
         {"type": "section", "text": {"type": "mrkdwn", "text": regression_summary}},
-        {"type": "section", "text": {"type": "mrkdwn", "text": difficulty_warning}},
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {"type": "plain_text", "text": "View Full Report"},
-                    "url": report_path,
-                }
-            ],
-        },
     ]
+    if difficulty_warning:
+        blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": difficulty_warning}})
+    if report_path.startswith(("http://", "https://")):
+        blocks.append(
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "action_id": "view_report",
+                        "text": {"type": "plain_text", "text": "View Full Report"},
+                        "url": report_path,
+                    }
+                ],
+            }
+        )
 
     payload = json.dumps({"blocks": blocks}).encode("utf-8")
 

@@ -20,6 +20,8 @@ PRICING_AUD: dict[str, dict[str, dict[str, float]]] = {
     },
     "gemini": {
         "gemini-2.0-flash": {"input_per_1k": 0.000114, "output_per_1k": 0.000570},
+        "gemini-3.5-flash": {"input_per_1k": 0.002325, "output_per_1k": 0.013950},
+        "gemini-3.5-flash-lite": {"input_per_1k": 0.000465, "output_per_1k": 0.003875},
     },
 }
 

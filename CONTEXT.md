@@ -44,7 +44,7 @@
 | Scheduling/CI | GitHub Actions | Triggers on `/prompts` or `/src` path changes |
 | Reporting | Jinja2 HTML report + Streamlit dashboard | HTML for per-run diff; Streamlit for historical trends |
 | Containerisation | Docker | Multi-stage build; env-var driven |
-| Synthetic data gen | OpenAI `gpt-4o` | One-off script; output verified before use |
+| Synthetic data gen | Gemini `gemini-3.5-flash-lite` | One-off script; output verified before use |
 | Cost tracking | Custom (`cost.py`) | Per-run token cost in AUD; per-provider pricing constants |
 
 ---
@@ -170,7 +170,7 @@ Default: `"openai"`.
 |---|---|---|
 | openai | `gpt-4o-mini` | `gpt-4o-mini` |
 | anthropic | `claude-haiku-4-5` | `claude-haiku-4-5` |
-| gemini | `gemini-2.0-flash` | `gemini-2.0-flash` |
+| gemini | `gemini-3.5-flash-lite` | `gemini-3.5-flash-lite` |
 
 All three must produce identical output schema (`ClassificationResult`). Provider differences are contained entirely within `src/providers/`.
 
@@ -280,7 +280,8 @@ PRICING_AUD = {
         "claude-haiku-4-5": {"input_per_1k": 0.000380, "output_per_1k": 0.001900},
     },
     "gemini": {
-        "gemini-2.0-flash": {"input_per_1k": 0.000114, "output_per_1k": 0.000570},
+        "gemini-3.5-flash": {"input_per_1k": 0.002325, "output_per_1k": 0.013950},
+        "gemini-3.5-flash-lite": {"input_per_1k": 0.000465, "output_per_1k": 0.003875},
     },
 }
 ```
@@ -581,6 +582,7 @@ PROVIDER=openai                       # Default; options: openai, anthropic, gem
 MODEL_UNDER_TEST=gpt-4o-mini          # Default (provider-specific; overrides provider default)
 JUDGE_PROVIDER=openai                 # Default; judge can differ from model under test
 JUDGE_MODEL=gpt-4o-mini               # Default
+GEMINI_REQUESTS_PER_MINUTE=14         # Default; paces Gemini calls under the free-tier 15 RPM cap
 
 # Alerting
 SLACK_WEBHOOK_URL=          # Required for alerting

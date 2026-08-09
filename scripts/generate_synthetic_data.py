@@ -1,14 +1,17 @@
-"""Generate 100 golden dataset cases via OpenAI gpt-4o in three modes."""
+"""Generate 100 golden dataset cases via Gemini (free tier) in three modes."""
 
 import json
 import logging
+import os
+import re
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
-from openai import OpenAI, APIStatusError, APITimeoutError, APIConnectionError
+from google import genai
+from google.genai import types
 from pydantic import ValidationError
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -48,9 +51,9 @@ MULTILINGUAL_DISTRIBUTION: dict[str, int] = {
     "general": 2,
 }
 
-GENERATOR_MODEL = "gpt-4o"
+GENERATOR_MODEL = "gemini-3.5-flash-lite"
 GENERATION_TEMPERATURE = 0.9
-MAX_RETRIES = 3
+MAX_RETRIES = 8
 RETRY_BASE_DELAY = 1.0
 
 STANDARD_PROMPT = """\
@@ -124,31 +127,41 @@ For each email, respond ONLY with a JSON array. Each object must have:
 No markdown. No preamble. Output only the JSON array."""
 
 
-def call_gpt4o(client: OpenAI, prompt: str) -> tuple[str, int, int]:
-    """Call gpt-4o with retries; return (text, input_tokens, output_tokens)."""
+def call_gemini(prompt: str, client: genai.Client) -> tuple[str, int, int]:
+    """Call the Gemini generator model with retries; return (text, input_tokens, output_tokens)."""
     last_exc: Exception | None = None
+    config = types.GenerateContentConfig(
+        temperature=GENERATION_TEMPERATURE,
+        response_mime_type="application/json",
+    )
     for attempt in range(MAX_RETRIES):
         try:
-            response = client.chat.completions.create(
+            response = client.models.generate_content(
                 model=GENERATOR_MODEL,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=GENERATION_TEMPERATURE,
-                response_format={"type": "json_object"},
+                contents=prompt,
+                config=config,
             )
-            text = response.choices[0].message.content or ""
-            usage = response.usage
-            input_tokens = usage.prompt_tokens if usage else 0
-            output_tokens = usage.completion_tokens if usage else 0
+            text = response.text or ""
+            usage = response.usage_metadata
+            input_tokens = usage.prompt_token_count if usage else 0
+            output_tokens = usage.candidates_token_count if usage else 0
             return text, input_tokens, output_tokens
-        except (APIStatusError, APITimeoutError, APIConnectionError, OSError) as exc:
+        except Exception as exc:
             last_exc = exc
-            is_transient = isinstance(exc, (APITimeoutError, APIConnectionError)) or (
-                isinstance(exc, APIStatusError) and exc.status_code in (429, 500, 502, 503)
-            )
-            if not is_transient or attempt == MAX_RETRIES - 1:
+            message = str(exc)
+            if "429" not in message and "RESOURCE_EXHAUSTED" not in message:
                 raise
-            delay = RETRY_BASE_DELAY * (2 ** attempt)
-            logger.warning("  Retry %d/%d after %.1fs: %s", attempt + 1, MAX_RETRIES, delay, exc)
+            if attempt == MAX_RETRIES - 1:
+                raise
+            match = re.search(r"(?:seconds|retryDelay|retry in)[:'\s]*(\d+(?:\.\d+)?)", message)
+            delay = (float(match.group(1)) + 1.0) if match else (RETRY_BASE_DELAY * (2 ** attempt))
+            logger.warning(
+                "  Rate limit hit (retry %d/%d); backing off %.1fs: %s",
+                attempt + 1,
+                MAX_RETRIES,
+                delay,
+                exc,
+            )
             time.sleep(delay)
     raise last_exc  # type: ignore[misc]
 
@@ -205,9 +218,7 @@ def validate_and_collect(
     return skipped
 
 
-def generate_standard_cases(
-    client: OpenAI,
-) -> tuple[list[GoldenCase], int, int, int]:
+def generate_standard_cases(client: genai.Client) -> tuple[list[GoldenCase], int, int, int]:
     """Generate 80 standard cases; return (cases, skipped, input_tokens, output_tokens)."""
     logger.info("=== MODE 1: Standard cases (80 total) ===")
     cases: list[GoldenCase] = []
@@ -220,7 +231,7 @@ def generate_standard_cases(
         for difficulty in DIFFICULTIES:
             prompt = STANDARD_PROMPT.format(count=5, category=category, difficulty=difficulty)
             try:
-                raw_text, inp, out = call_gpt4o(client, prompt)
+                raw_text, inp, out = call_gemini(prompt, client)
                 total_input += inp
                 total_output += out
                 raw_cases = extract_cases(raw_text)
@@ -241,9 +252,7 @@ def generate_standard_cases(
     return cases, total_skipped, total_input, total_output
 
 
-def generate_adversarial_cases(
-    client: OpenAI, start_counter: int
-) -> tuple[list[GoldenCase], int, int, int]:
+def generate_adversarial_cases(start_counter: int, client: genai.Client) -> tuple[list[GoldenCase], int, int, int]:
     """Generate 10 adversarial cases; return (cases, skipped, input_tokens, output_tokens)."""
     logger.info("=== MODE 2: Adversarial cases (10 total) ===")
     cases: list[GoldenCase] = []
@@ -257,7 +266,7 @@ def generate_adversarial_cases(
             count=2, wrong_category=wrong_cat, correct_category=correct_cat
         )
         try:
-            raw_text, inp, out = call_gpt4o(client, prompt)
+            raw_text, inp, out = call_gemini(prompt, client)
             total_input += inp
             total_output += out
             raw_cases = extract_cases(raw_text)
@@ -278,9 +287,7 @@ def generate_adversarial_cases(
     return cases, total_skipped, total_input, total_output
 
 
-def generate_multilingual_cases(
-    client: OpenAI, start_counter: int
-) -> tuple[list[GoldenCase], int, int, int]:
+def generate_multilingual_cases(start_counter: int, client: genai.Client) -> tuple[list[GoldenCase], int, int, int]:
     """Generate 10 multilingual cases; return (cases, skipped, input_tokens, output_tokens)."""
     logger.info("=== MODE 3: Multilingual cases (10 total) ===")
     cases: list[GoldenCase] = []
@@ -292,7 +299,7 @@ def generate_multilingual_cases(
     for category, count in MULTILINGUAL_DISTRIBUTION.items():
         prompt = MULTILINGUAL_PROMPT.format(count=count, category=category)
         try:
-            raw_text, inp, out = call_gpt4o(client, prompt)
+            raw_text, inp, out = call_gemini(prompt, client)
             total_input += inp
             total_output += out
             raw_cases = extract_cases(raw_text)
@@ -345,7 +352,7 @@ def print_breakdown(dataset: GoldenDataset) -> None:
 def main() -> None:
     """Generate all 100 golden dataset cases and write to JSON."""
     load_dotenv(Path(__file__).resolve().parent.parent / ".env")
-    client = OpenAI()
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY", ""))
 
     all_cases: list[GoldenCase] = []
     total_api_calls = 0
@@ -359,7 +366,7 @@ def main() -> None:
     cum_output += s_out
 
     adversarial_cases, a_skip, a_in, a_out = generate_adversarial_cases(
-        client, start_counter=len(all_cases)
+        start_counter=len(all_cases), client=client
     )
     all_cases.extend(adversarial_cases)
     total_api_calls += 5
@@ -367,7 +374,7 @@ def main() -> None:
     cum_output += a_out
 
     multilingual_cases, m_skip, m_in, m_out = generate_multilingual_cases(
-        client, start_counter=len(all_cases)
+        start_counter=len(all_cases), client=client
     )
     all_cases.extend(multilingual_cases)
     total_api_calls += 4
@@ -375,7 +382,7 @@ def main() -> None:
     cum_output += m_out
 
     total_skipped = s_skip + a_skip + m_skip
-    cost_aud = calculate_cost_aud("openai", GENERATOR_MODEL, cum_input, cum_output)
+    cost_aud = calculate_cost_aud("gemini", GENERATOR_MODEL, cum_input, cum_output)
 
     metadata = GenerationMetadata(
         generator_model=GENERATOR_MODEL,

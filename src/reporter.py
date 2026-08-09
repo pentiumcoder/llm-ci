@@ -7,9 +7,11 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from src.models import CaseResult, EvalRun, GoldenDataset, RunDiff
+from src.models import CaseResult, EvalRun, GoldenCase, GoldenDataset, RunDiff
 
 logger = logging.getLogger(__name__)
+
+ReportRow = dict[str, str | float | None]
 
 _TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
 _CATEGORIES = ["billing", "technical", "account", "general"]
@@ -70,7 +72,7 @@ def generate_report(
 
 def build_regression_table_data(
     run: EvalRun, diff: RunDiff, dataset: GoldenDataset
-) -> list[dict]:
+) -> list[ReportRow]:
     """Build row data for the regression cases table from the run diff."""
     if not diff.regression_cases:
         return []
@@ -81,7 +83,7 @@ def build_regression_table_data(
 
 def build_improvement_table_data(
     run: EvalRun, diff: RunDiff, dataset: GoldenDataset
-) -> list[dict]:
+) -> list[ReportRow]:
     """Build row data for the improvement cases table from the run diff."""
     if not diff.improvement_cases:
         return []
@@ -92,11 +94,11 @@ def build_improvement_table_data(
 
 def _build_case_table_rows(
     case_ids: list[str],
-    case_map: dict,
+    case_map: dict[str, GoldenCase],
     result_map: dict[str, CaseResult],
-) -> list[dict]:
+) -> list[ReportRow]:
     """Map a list of case IDs into table row dicts."""
-    rows: list[dict] = []
+    rows: list[ReportRow] = []
     for cid in case_ids:
         golden = case_map.get(cid)
         cr = result_map.get(cid)
