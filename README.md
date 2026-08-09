@@ -218,4 +218,4 @@ Covers providers (incl. 429/5xx retry behaviour, rate limiting), scoring, statis
 
 ---
 
-Built in 11 sprints as an end-to-end LLM evaluation platform. See [`CONTEXT.md`](CONTEXT.md) for the full design spec and [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidelines.
+An end-to-end LLM evaluation platform. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidelines.
