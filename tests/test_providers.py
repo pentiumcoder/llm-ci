@@ -296,6 +296,91 @@ class TestGeminiProvider:
         )
         assert _retry_delay_seconds(exc) == _FALLBACK_RETRY_SECONDS
 
+    def test_retryable_detects_sdk_503(self):
+        from google.genai import errors
+
+        from src.providers.gemini_provider import _is_retryable
+
+        exc = errors.ServerError(
+            503,
+            {
+                "error": {
+                    "status": "UNAVAILABLE",
+                    "message": (
+                        "This model is currently experiencing high demand. "
+                        "Spikes in demand are usually temporary. Please try again later."
+                    ),
+                }
+            },
+        )
+        assert _is_retryable(exc)
+
+    def test_retryable_detects_sdk_500(self):
+        from google.genai import errors
+
+        from src.providers.gemini_provider import _is_retryable
+
+        exc = errors.ServerError(
+            500,
+            {"error": {"status": "INTERNAL", "message": "Internal error"}},
+        )
+        assert _is_retryable(exc)
+
+    def test_retryable_false_for_400(self):
+        from google.genai import errors
+
+        from src.providers.gemini_provider import _is_retryable
+
+        exc = errors.ClientError(
+            400,
+            {"error": {"status": "INVALID_ARGUMENT", "message": "Bad request"}},
+        )
+        assert not _is_retryable(exc)
+
+    def test_retry_backoff_grows_and_caps(self):
+        from src.providers.gemini_provider import _retry_backoff_seconds
+
+        first = _retry_backoff_seconds(1)
+        fourth = _retry_backoff_seconds(4)
+        late = _retry_backoff_seconds(8)
+
+        assert first < fourth
+        assert 5.0 <= first < 6.0
+        assert 60.0 <= late < 61.0
+
+    @pytest.mark.asyncio
+    async def test_complete_retries_on_503_then_succeeds(self):
+        from google.genai import errors
+
+        mock_usage = SimpleNamespace(prompt_token_count=15, candidates_token_count=7)
+        mock_response = SimpleNamespace(text="Gemini response", usage_metadata=mock_usage)
+        server_error = errors.ServerError(
+            503,
+            {
+                "error": {
+                    "status": "UNAVAILABLE",
+                    "message": "This model is currently experiencing high demand.",
+                }
+            },
+        )
+
+        with patch("src.providers.gemini_provider.genai") as mock_genai, patch(
+            "src.providers.gemini_provider.asyncio.sleep", new=AsyncMock()
+        ) as mock_sleep:
+            mock_client = mock_genai.Client.return_value
+            mock_client.aio.models.generate_content = AsyncMock(
+                side_effect=[server_error, mock_response]
+            )
+
+            from src.providers.gemini_provider import GeminiProvider
+
+            provider = GeminiProvider(_settings())
+            result = await provider.complete("system", "user", "gemini-3.5-flash-lite")
+
+        assert result["text"] == "Gemini response"
+        assert result["input_tokens"] == 15
+        mock_sleep.assert_awaited_once()
+
     @pytest.mark.asyncio
     async def test_rate_limiter_enforces_cap(self):
         from src.providers.gemini_provider import _RateLimiter

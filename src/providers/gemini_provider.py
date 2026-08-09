@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import random
 import re
 import time
 
@@ -16,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 _MAX_ATTEMPTS = 8
 _FALLBACK_RETRY_SECONDS = 65.0
+_BACKOFF_BASE_SECONDS = 5.0
+_BACKOFF_CAP_SECONDS = 60.0
 _RETRY_DELAY_RE = re.compile(
     r"(?:seconds|retryDelay|retry in)[:'\s]*(\d+(?:\.\d+)?)"
 )
@@ -53,6 +56,26 @@ def _is_rate_limited(exc: Exception) -> bool:
         return True
     message = str(exc)
     return "429" in message or "RESOURCE_EXHAUSTED" in message
+
+
+def _is_retryable(exc: Exception) -> bool:
+    """Return True if the exception is a transient Gemini API error."""
+    if isinstance(exc, errors.APIError):
+        if exc.code == 429 or exc.code >= 500:
+            return True
+    message = str(exc)
+    return (
+        "429" in message
+        or "RESOURCE_EXHAUSTED" in message
+        or "503" in message
+        or "UNAVAILABLE" in message
+    )
+
+
+def _retry_backoff_seconds(attempt: int) -> float:
+    """Exponential backoff with jitter for transient 5xx errors."""
+    delay = min(_BACKOFF_BASE_SECONDS * (2 ** (attempt - 1)), _BACKOFF_CAP_SECONDS)
+    return delay + random.uniform(0.0, 1.0)
 
 
 def _retry_delay_seconds(exc: Exception) -> float:
@@ -111,10 +134,16 @@ class GeminiProvider(BaseProvider):
                 }
             except Exception as exc:
                 last_exc = exc
-                if _is_rate_limited(exc):
-                    retry_seconds = _retry_delay_seconds(exc)
+                if _is_retryable(exc):
+                    if _is_rate_limited(exc):
+                        retry_seconds = _retry_delay_seconds(exc)
+                        reason = "rate limit"
+                    else:
+                        retry_seconds = _retry_backoff_seconds(attempt)
+                        reason = f"transient {type(exc).__name__}"
                     logger.warning(
-                        "Gemini rate limit hit (attempt %d/%d); backing off %.1fs",
+                        "Gemini %s (attempt %d/%d); backing off %.1fs",
+                        reason,
                         attempt,
                         _MAX_ATTEMPTS,
                         retry_seconds,

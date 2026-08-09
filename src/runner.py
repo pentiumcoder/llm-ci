@@ -33,6 +33,35 @@ logger = logging.getLogger(__name__)
 _MAX_CONCURRENT = 5
 
 
+def _failed_case_result(
+    case: GoldenCase,
+    prompt_config: PromptConfig,
+    settings: Settings,
+    error: str,
+) -> CaseResult:
+    """Return a zero-scoring CaseResult for a case whose classification failed."""
+    return CaseResult(
+        case_id=case.id,
+        prompt_version=prompt_config.version,
+        model=settings.model_under_test,
+        provider=settings.provider,
+        predicted_category="error",
+        expected_category=case.expected_category,
+        category_match=False,
+        summary_score_judge=0.0,
+        summary_score_embedding=0.0,
+        summary_score_keyword=0.0,
+        composite_summary_score=0.0,
+        judge_reason=f"Classification failed: {error[:200]}",
+        latency_ms=0,
+        input_tokens=0,
+        output_tokens=0,
+        estimated_cost_aud=0.0,
+        run_id="",
+        timestamp=datetime.now(timezone.utc),
+    )
+
+
 async def _run_one_case(
     case: GoldenCase,
     prompt_config: PromptConfig,
@@ -42,12 +71,16 @@ async def _run_one_case(
 ) -> CaseResult:
     """Run classify_email for a single case, then score the summary."""
     async with semaphore:
-        result = await classify_email(
-            email_text=case.input,
-            prompt_config=prompt_config,
-            provider=provider,
-            settings=settings,
-        )
+        try:
+            result = await classify_email(
+                email_text=case.input,
+                prompt_config=prompt_config,
+                provider=provider,
+                settings=settings,
+            )
+        except Exception as exc:
+            logger.error("Classification failed for case %s: %s", case.id, exc)
+            return _failed_case_result(case, prompt_config, settings, str(exc))
 
         cost = calculate_cost_aud(
             provider=provider.name,
