@@ -9,6 +9,7 @@ on:
     paths:
       - "prompts/**"
       - "src/**"
+  workflow_dispatch:
 
 jobs:
   eval:
